@@ -10,6 +10,7 @@ import {
 
 import { cn } from "@/client/lib/utils"
 import { Badge } from "@/client/components/ui/badge"
+import { Locale } from "@/client/methods/locale"
 import logoUrl from "@/client/assets/logo.svg"
 
 type NavItem = {
@@ -31,6 +32,8 @@ const secondaryNav: NavItem[] = [
 ]
 
 export function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
+  const locale = Locale("Menu")
+
   return (
     <>
       <div className="flex h-16 items-center gap-2 border-b px-6">
@@ -40,23 +43,23 @@ export function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
 
       <nav className="flex-1 space-y-1 overflow-y-auto p-3">
         <p className="text-muted-foreground px-3 pb-2 pt-2 text-xs font-semibold uppercase tracking-wider">
-          Workspace
+          {locale.Workspace}
         </p>
         {mainNav.map((item) => (
-          <SidebarItem key={item.href} item={item} onNavigate={onNavigate} />
+          <SidebarItem key={item.href} item={item} locale={locale} onNavigate={onNavigate} />
         ))}
 
         <p className="text-muted-foreground px-3 pb-2 pt-6 text-xs font-semibold uppercase tracking-wider">
-          General
+          {locale.General}
         </p>
         {secondaryNav.map((item) => (
-          <SidebarItem key={item.href} item={item} onNavigate={onNavigate} />
+          <SidebarItem key={item.href} item={item} locale={locale} onNavigate={onNavigate} />
         ))}
       </nav>
 
       <div className="border-t p-3">
         <div className="bg-sidebar-accent text-sidebar-accent-foreground rounded-lg p-3 text-xs">
-          <p className="font-medium">Tiny-Web Admin</p>
+          <p className="font-medium">{locale.AdminPanel}</p>
         </div>
       </div>
     </>
@@ -73,9 +76,11 @@ export function DesktopSidebar() {
 
 function SidebarItem({
   item,
+  locale,
   onNavigate,
 }: {
   item: NavItem
+  locale: { [key: string]: string }
   onNavigate?: () => void
 }) {
   const Icon = item.icon
@@ -93,7 +98,7 @@ function SidebarItem({
       }
     >
       <Icon className="size-4" />
-      <span className="flex-1">{item.title}</span>
+      <span className="flex-1">{locale[item.title]}</span>
       {item.badge && (
         <Badge variant="secondary" className="h-5 px-1.5 text-xs">
           {item.badge}

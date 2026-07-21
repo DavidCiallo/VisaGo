@@ -2,13 +2,14 @@ import {
     BrowserRouter as Router,
     Routes,
     Route,
-    Navigate,
     Outlet,
     useLocation,
+    Navigate,
 } from "react-router-dom";
 import { ThemeProvider } from "@/client/components/theme-provider";
 import { Toaster } from "@/client/components/ui/sonner";
 import { AdminLayout } from "@/client/components/admin/layout";
+import { HomePage } from "./pages/home/HomePage";
 import { AuthPage } from "./pages/auth/AuthPage";
 import { AccountPage } from "./pages/account/AccountPage";
 import { DemoPage } from "./pages/demo/DemoPage";
@@ -30,10 +31,10 @@ export default function App() {
         <ThemeProvider defaultTheme="dark">
             <Router>
                 <Routes>
+                    <Route path="/" element={<HomePage />} />
                     <Route path="/auth" element={<AuthPage />} />
                     <Route element={<PrivateRoute />}>
                         <Route element={<AdminLayout />}>
-                            <Route path="/" element={<Navigate to="/dashboard" replace />} />
                             <Route path="/dashboard" element={<DashboardPage />} />
                             <Route path="/demo" element={<DemoPage />} />
                             <Route path="/blog" element={<BlogPage />} />

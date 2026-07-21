@@ -1,0 +1,64 @@
+{
+    "Common": {
+        "AppName": "Tiny-Web"
+    },
+
+    "Menu": {
+        "Workspace": "工作区",
+        "General": "管理",
+        "Dashboard": "仪表盘",
+        "Demo": "示例",
+        "Blog": "博客",
+        "Accounts": "账户",
+        "Settings": "设置",
+        "AdminPanel": "Tiny-Web 管理面板"
+    },
+
+    "Topbar": {
+        "Dashboard": "仪表盘",
+        "Demo": "示例",
+        "Blog": "博客",
+        "Accounts": "账户",
+        "Settings": "设置",
+        "SearchPlaceholder": "搜索...",
+        "Notifications": "通知"
+    },
+
+    "AuthPage": {
+        "WelcomeBack": "欢迎回来",
+        "Description": "登录到 Tiny-Web 管理面板",
+        "EmailLabel": "邮箱",
+        "EmailPlaceholder": "you@example.com",
+        "PasswordLabel": "密码",
+        "PasswordPlaceholder": "••••••••",
+        "SignIn": "登录",
+        "SigningIn": "登录中...",
+        "SignInSuccess": "登录成功",
+        "SignInFailed": "登录失败"
+    },
+
+    "HomePage": {
+        "Login": "登录",
+        "EnterPanel": "进入面板",
+        "Badge": "Bun + React 全栈驱动",
+        "HeroTitle1": "极简",
+        "HeroHighlight": "全栈管理",
+        "HeroTitle2": "框架",
+        "HeroDesc": "基于 Bun 运行时的轻量级后台管理框架，内置用户认证、内容管理与 CRUD 示例，开箱即用，无需数据库。",
+        "GetStarted": "开始使用",
+        "ViewSource": "查看源码",
+        "FeatureDashboardTitle": "数据仪表盘",
+        "FeatureDashboardDesc": "实时统计概览，活动追踪，一目了然掌握系统运行状态。",
+        "FeatureBlogTitle": "博客管理",
+        "FeatureBlogDesc": "创建、编辑、发布文章，支持分页与搜索。",
+        "FeatureAccountsTitle": "账户管理",
+        "FeatureAccountsDesc": "用户增删改查，角色权限控制。",
+        "FeatureDemoTitle": "CRUD 示例",
+        "FeatureDemoDesc": "完整的增删改查模板，快速搭建新模块。",
+        "FeatureAuthTitle": "安全认证",
+        "FeatureAuthDesc": "JWT Token 鉴权，路由守卫保护管理接口。",
+        "TerminalReady": "前端就绪 → localhost:3300",
+        "TerminalServer": "API 服务就绪 → localhost:3300/api",
+        "FooterText": "以极简方式构建后台系统"
+    }
+}

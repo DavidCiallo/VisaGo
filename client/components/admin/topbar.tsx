@@ -4,8 +4,10 @@ import { Bell, Menu, Search } from "lucide-react"
 import { Button } from "@/client/components/ui/button"
 import { Input } from "@/client/components/ui/input"
 import { Separator } from "@/client/components/ui/separator"
+import { LanguageToggle } from "@/client/components/language-toggle"
 import { ThemeToggle } from "@/client/components/theme-toggle"
 import { UserMenu } from "@/client/components/admin/user-menu"
+import { Locale } from "@/client/methods/locale"
 
 const titleMap: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -17,7 +19,9 @@ const titleMap: Record<string, string> = {
 
 export function Topbar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
   const { pathname } = useLocation()
-  const title = titleMap[pathname] ?? "Tiny-Web"
+  const locale = Locale("Topbar")
+  const titleKey = titleMap[pathname]
+  const title = titleKey ? locale[titleKey] : "Tiny-Web"
 
   return (
     <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-30 flex h-16 items-center gap-2 border-b px-4 backdrop-blur sm:gap-4 sm:px-6">
@@ -39,7 +43,7 @@ export function Topbar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
       <div className="relative ml-1 hidden max-w-md flex-1 md:block">
         <Search className="text-muted-foreground absolute left-2.5 top-1/2 size-4 -translate-y-1/2" />
         <Input
-          placeholder="Search..."
+          placeholder={locale.SearchPlaceholder}
           className="bg-muted/40 h-9 border-none pl-8"
         />
       </div>
@@ -48,8 +52,9 @@ export function Topbar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="size-4" />
           <span className="bg-destructive absolute right-1.5 top-1.5 size-2 rounded-full" />
-          <span className="sr-only">Notifications</span>
+          <span className="sr-only">{locale.Notifications}</span>
         </Button>
+        <LanguageToggle variant="ghost" />
         <ThemeToggle />
         <Separator orientation="vertical" className="mx-1 hidden h-6 sm:block" />
         <UserMenu />

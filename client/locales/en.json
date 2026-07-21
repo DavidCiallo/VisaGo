@@ -1,0 +1,64 @@
+{
+    "Common": {
+        "AppName": "Tiny-Web"
+    },
+
+    "Menu": {
+        "Workspace": "Workspace",
+        "General": "General",
+        "Dashboard": "Dashboard",
+        "Demo": "Demo",
+        "Blog": "Blog",
+        "Accounts": "Accounts",
+        "Settings": "Settings",
+        "AdminPanel": "Tiny-Web Admin"
+    },
+
+    "Topbar": {
+        "Dashboard": "Dashboard",
+        "Demo": "Demo",
+        "Blog": "Blog",
+        "Accounts": "Accounts",
+        "Settings": "Settings",
+        "SearchPlaceholder": "Search...",
+        "Notifications": "Notifications"
+    },
+
+    "AuthPage": {
+        "WelcomeBack": "Welcome back",
+        "Description": "Sign in to your Tiny-Web admin panel",
+        "EmailLabel": "Email",
+        "EmailPlaceholder": "you@example.com",
+        "PasswordLabel": "Password",
+        "PasswordPlaceholder": "••••••••",
+        "SignIn": "Sign in",
+        "SigningIn": "Signing in...",
+        "SignInSuccess": "Signed in",
+        "SignInFailed": "Login failed"
+    },
+
+    "HomePage": {
+        "Login": "Login",
+        "EnterPanel": "Dashboard",
+        "Badge": "Powered by Bun + React",
+        "HeroTitle1": "A Minimal",
+        "HeroHighlight": "Full-Stack Admin",
+        "HeroTitle2": "Framework",
+        "HeroDesc": "A lightweight admin framework built on the Bun runtime. Ships with auth, content management, and CRUD demos out of the box — no database required.",
+        "GetStarted": "Get Started",
+        "ViewSource": "View Source",
+        "FeatureDashboardTitle": "Dashboard",
+        "FeatureDashboardDesc": "Real-time stats, activity tracking, and system overview at a glance.",
+        "FeatureBlogTitle": "Blog Management",
+        "FeatureBlogDesc": "Create, edit, and publish posts with pagination and search.",
+        "FeatureAccountsTitle": "Account Management",
+        "FeatureAccountsDesc": "Full user CRUD with role-based access control.",
+        "FeatureDemoTitle": "CRUD Demo",
+        "FeatureDemoDesc": "A complete create-read-update-delete template to bootstrap new modules.",
+        "FeatureAuthTitle": "Secure Auth",
+        "FeatureAuthDesc": "JWT token authentication with route guards protecting admin APIs.",
+        "TerminalReady": "Frontend ready → localhost:3300",
+        "TerminalServer": "API server ready → localhost:3300/api",
+        "FooterText": "Build admin systems the minimal way"
+    }
+}
