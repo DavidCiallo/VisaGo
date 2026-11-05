@@ -16,7 +16,7 @@ import { Locale } from "@/client/methods/locale"
 export function AuthPage() {
   const navigate = useNavigate()
   const locale = Locale("AuthPage")
-  const [email, setEmail] = useState("admin@tiny-web.local")
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
 
@@ -28,7 +28,7 @@ export function AuthPage() {
     if (res.success && res.data?.token) {
       setAuth(res.data.token)
       toast.success(locale.SignInSuccess)
-      navigate("/dashboard")
+      navigate("/visa-orders")
     } else {
       toast.error(res.message || locale.SignInFailed)
     }
@@ -43,9 +43,8 @@ export function AuthPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="bg-primary text-primary-foreground mx-auto mb-2 flex size-12 items-center justify-center rounded-xl text-xl font-bold">
-            T
-          </div>
-          <CardTitle className="text-2xl">{locale.WelcomeBack}</CardTitle>
+            V
+          </div>          <CardTitle className="text-2xl">{locale.WelcomeBack}</CardTitle>
           <CardDescription>{locale.Description}</CardDescription>
         </CardHeader>
         <CardContent>

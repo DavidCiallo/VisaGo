@@ -18,8 +18,8 @@ import { toast } from "@/client/methods/notify"
 
 export function SettingsPage() {
   const { theme, setTheme } = useTheme()
-  const [name, setName] = useState("Admin User")
-  const [email, setEmail] = useState("admin@tiny-web.local")
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
 
   function onSave(e: React.FormEvent) {
     e.preventDefault()
@@ -46,6 +46,7 @@ export function SettingsPage() {
               <Label htmlFor="name">Display name</Label>
               <Input
                 id="name"
+                placeholder="Your name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
@@ -55,6 +56,7 @@ export function SettingsPage() {
               <Input
                 id="email"
                 type="email"
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -67,7 +69,7 @@ export function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Appearance</CardTitle>
-          <CardDescription>Choose how Tiny-Web looks to you</CardDescription>
+          <CardDescription>Choose how visago looks to you</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-3 gap-3">

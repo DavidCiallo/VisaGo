@@ -1,12 +1,5 @@
 import { NavLink } from "react-router-dom"
-import {
-  LayoutDashboard,
-  Newspaper,
-  Users,
-  FlaskConical,
-  Settings,
-  type LucideIcon,
-} from "lucide-react"
+import { Plane, ClipboardList, QrCode, Settings, type LucideIcon } from "lucide-react"
 
 import { cn } from "@/client/lib/utils"
 import { Badge } from "@/client/components/ui/badge"
@@ -21,10 +14,9 @@ type NavItem = {
 }
 
 const mainNav: NavItem[] = [
-  { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { title: "Demo", href: "/demo", icon: FlaskConical },
-  { title: "Blog", href: "/blog", icon: Newspaper, badge: "New" },
-  { title: "Accounts", href: "/account", icon: Users },
+  { title: "Visa", href: "/visa-settings", icon: Plane },
+  { title: "Orders", href: "/visa-orders", icon: ClipboardList },
+  { title: "收款码", href: "/visa-pay-codes", icon: QrCode },
 ]
 
 const secondaryNav: NavItem[] = [
@@ -38,7 +30,7 @@ export function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
     <>
       <div className="flex h-16 items-center gap-2 border-b px-6">
         <img src={logoUrl} alt="" className="size-8" aria-hidden="true" />
-        <span className="text-lg font-semibold tracking-tight">Tiny-Web</span>
+        <span className="text-lg font-semibold tracking-tight">visago</span>
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto p-3">

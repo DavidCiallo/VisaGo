@@ -1,4 +1,4 @@
-# Tiny-Web
+# visago
 
 Full-stack TypeScript app — React frontend + Bun backend, single service.
 

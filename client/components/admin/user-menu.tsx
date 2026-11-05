@@ -13,7 +13,7 @@ import {
 } from "@/client/components/ui/dropdown-menu"
 import { clearAuth } from "@/client/methods/auth"
 
-const SEED = "admin@tiny-web.local"
+const SEED = "admin@visago.local"
 const avatarUrl = `https://api.dicebear.com/7.x/glass/svg?seed=${encodeURIComponent(SEED)}`
 
 export function UserMenu() {
@@ -43,10 +43,7 @@ export function UserMenu() {
               <AvatarFallback className="text-xs">A</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <span className="text-sm font-medium">Admin User</span>
-              <span className="text-muted-foreground text-xs font-normal">
-                admin@tiny-web.local
-              </span>
+              <span className="text-sm font-medium">Admin</span>
             </div>
           </div>
         </DropdownMenuLabel>

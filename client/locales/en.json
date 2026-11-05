@@ -1,20 +1,24 @@
 {
     "Common": {
-        "AppName": "Tiny-Web"
+        "AppName": "visago"
     },
 
     "Menu": {
         "Workspace": "Workspace",
         "General": "General",
+        "Visa": "Visa",
+        "Orders": "Orders",
         "Dashboard": "Dashboard",
         "Demo": "Demo",
         "Blog": "Blog",
         "Accounts": "Accounts",
         "Settings": "Settings",
-        "AdminPanel": "Tiny-Web Admin"
+        "AdminPanel": "visago Admin"
     },
 
     "Topbar": {
+        "Visa": "Visa",
+        "Orders": "Orders",
         "Dashboard": "Dashboard",
         "Demo": "Demo",
         "Blog": "Blog",
@@ -26,7 +30,7 @@
 
     "AuthPage": {
         "WelcomeBack": "Welcome back",
-        "Description": "Sign in to your Tiny-Web admin panel",
+        "Description": "Sign in to your visago admin panel",
         "EmailLabel": "Email",
         "EmailPlaceholder": "you@example.com",
         "PasswordLabel": "Password",

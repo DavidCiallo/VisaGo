@@ -10,6 +10,8 @@ import { UserMenu } from "@/client/components/admin/user-menu"
 import { Locale } from "@/client/methods/locale"
 
 const titleMap: Record<string, string> = {
+  "/visa-settings": "Visa",
+  "/visa-orders": "Orders",
   "/dashboard": "Dashboard",
   "/demo": "Demo",
   "/blog": "Blog",
@@ -21,7 +23,7 @@ export function Topbar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
   const { pathname } = useLocation()
   const locale = Locale("Topbar")
   const titleKey = titleMap[pathname]
-  const title = titleKey ? locale[titleKey] : "Tiny-Web"
+  const title = titleKey ? locale[titleKey] : "visago"
 
   return (
     <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-30 flex h-16 items-center gap-2 border-b px-4 backdrop-blur sm:gap-4 sm:px-6">

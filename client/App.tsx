@@ -2,45 +2,38 @@ import {
     BrowserRouter as Router,
     Routes,
     Route,
-    Outlet,
-    useLocation,
-    Navigate,
 } from "react-router-dom";
 import { ThemeProvider } from "@/client/components/theme-provider";
 import { Toaster } from "@/client/components/ui/sonner";
 import { AdminLayout } from "@/client/components/admin/layout";
-import { HomePage } from "./pages/home/HomePage";
+import { VisaLandingPage } from "./pages/visa/VisaLandingPage";
+import { VisaBookingPage } from "./pages/visa/VisaBookingPage";
+import { JoinPage } from "./pages/visa/JoinPage";
+import { OrderStatusPage } from "./pages/visa/OrderStatusPage";
 import { AuthPage } from "./pages/auth/AuthPage";
-import { AccountPage } from "./pages/account/AccountPage";
-import { DemoPage } from "./pages/demo/DemoPage";
-import { BlogPage } from "./pages/blog/BlogPage";
-import { DashboardPage } from "./pages/dashboard/DashboardPage";
 import { SettingsPage } from "./pages/settings/SettingsPage";
-import { getAuth } from "./methods/auth";
-
-function PrivateRoute() {
-    const location = useLocation();
-    if (!getAuth()) {
-        return <Navigate to="/auth" replace state={{ from: location }} />;
-    }
-    return <Outlet />;
-}
+import { VisaSettingsPage } from "./pages/visa/VisaSettingsPage";
+import { VisaOrdersPage } from "./pages/visa/VisaOrdersPage";
+import { VisaPayCodePage } from "./pages/visa/VisaPayCodePage";
 
 export default function App() {
     return (
-        <ThemeProvider defaultTheme="dark">
+        <ThemeProvider defaultTheme="light">
             <Router>
                 <Routes>
-                    <Route path="/" element={<HomePage />} />
+                    <Route path="/" element={<VisaLandingPage />} />
+                    <Route path="/apply" element={<VisaBookingPage />} />
+                    <Route path="/join" element={<JoinPage />} />
+                    <Route path="/join/:token" element={<JoinPage />} />
+                    <Route path="/order" element={<OrderStatusPage />} />
+                    <Route path="/order/:token" element={<OrderStatusPage />} />
                     <Route path="/auth" element={<AuthPage />} />
-                    <Route element={<PrivateRoute />}>
-                        <Route element={<AdminLayout />}>
-                            <Route path="/dashboard" element={<DashboardPage />} />
-                            <Route path="/demo" element={<DemoPage />} />
-                            <Route path="/blog" element={<BlogPage />} />
-                            <Route path="/account" element={<AccountPage />} />
-                            <Route path="/settings" element={<SettingsPage />} />
-                        </Route>
+                    <Route element={<AdminLayout />}>
+                        <Route path="/admin" element={<VisaOrdersPage />} />
+                        <Route path="/visa-settings" element={<VisaSettingsPage />} />
+                        <Route path="/visa-orders" element={<VisaOrdersPage />} />
+                        <Route path="/visa-pay-codes" element={<VisaPayCodePage />} />
+                        <Route path="/settings" element={<SettingsPage />} />
                     </Route>
                 </Routes>
             </Router>

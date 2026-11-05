@@ -4,7 +4,7 @@ import path from "node:path";
 
 export default defineConfig({
     html: {
-        title: "Tiny-Web",
+        title: "visago",
     },
     plugins: [pluginReact()],
     source: {
@@ -21,6 +21,7 @@ export default defineConfig({
         filenameHash: false,
     },
     server: {
+        historyApiFallback: true,
         proxy: {
             "/api": {
                 target: "http://127.0.0.1:3900",

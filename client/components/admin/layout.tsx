@@ -1,8 +1,9 @@
-import { useState } from "react"
-import { Outlet } from "react-router-dom"
-
+import { useEffect, useState } from "react"
+import { Outlet, useNavigate } from "react-router-dom"
 import { DesktopSidebar, SidebarBody } from "@/client/components/admin/sidebar"
 import { Topbar } from "@/client/components/admin/topbar"
+import { authApi } from "@/client/api/instance"
+import { clearAuth, getAuth } from "@/client/methods/auth"
 import {
   Sheet,
   SheetContent,
@@ -12,9 +13,29 @@ import {
 
 export function AdminLayout() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [ready, setReady] = useState(false)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!getAuth()) {
+      navigate("/auth", { replace: true })
+      return
+    }
+
+    authApi.alive({}).then((res) => {
+      if (res.success) {
+        setReady(true)
+        return
+      }
+      clearAuth()
+      navigate("/auth", { replace: true })
+    })
+  }, [])
+
+  if (!ready) return null
 
   return (
-    <div className="bg-background flex min-h-screen w-full">
+    <div className="bg-background flex h-screen w-full overflow-hidden">
       <DesktopSidebar />
 
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
