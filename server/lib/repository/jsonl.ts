@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { nanoid } from "nanoid";
+import { customAlphabet } from "nanoid";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
@@ -7,7 +7,12 @@ import type { RepositoryDriver } from "./driver";
 
 const _filename = fileURLToPath(import.meta.url);
 const SERVER_DIR = path.resolve(path.dirname(_filename), "../..");
-const DATA_DIR = path.join(path.resolve(SERVER_DIR, ".."), "data");
+const DATA_DIR = process.env.DATA_DIR
+    ? path.resolve(process.env.DATA_DIR)
+    : path.join(path.resolve(SERVER_DIR, ".."), "data");
+
+/** 页面上的编号直接给人看，只用大写字母，避开 - 和 _。 */
+const newId = customAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 6);
 
 if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -235,7 +240,7 @@ export const JsonlDriver: RepositoryDriver = {
     async insert(collection, entity) {
         return withLock(collection, async () => {
             const now = Date.now();
-            const id = entity.id || nanoid(6);
+            const id = entity.id || newId();
             const row = {
                 ...entity,
                 id,
@@ -374,7 +379,7 @@ export const JsonlDriver: RepositoryDriver = {
             const now = Date.now();
             const rows = entities.map((e) => ({
                 ...e,
-                id: e.id || nanoid(6),
+                id: e.id || newId(),
                 create_time: e.create_time || now,
                 update_time: e.update_time || now,
                 delete_time: null,

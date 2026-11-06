@@ -119,6 +119,12 @@ export async function mounthttp(req: Request, mounts: RouteMount[]): Promise<Res
 
 const validStaticFiles = new Set<string>();
 
+// 打包产物的文件名不带 hash，所以一律 no-cache，否则手机会一直跑旧包
+function cacheHeaders(response: Response) {
+    response.headers.set("Cache-Control", "no-cache");
+    return response;
+}
+
 export async function mountstatic(staticPath: string, pathName: string) {
     if (pathName.endsWith(".mjs")) {
         return new Response("Forbidden", { status: 403 });
@@ -142,17 +148,17 @@ export async function mountstatic(staticPath: string, pathName: string) {
         const file = Bun.file(filePath);
         if (await file.exists()) {
             validStaticFiles.add(filePath);
-            return new Response(file);
+            return cacheHeaders(new Response(file));
         }
     } else {
         // @ts-ignore
         const file = Bun.file(filePath);
-        return new Response(file);
+        return cacheHeaders(new Response(file));
     }
 
     if (!pathName.startsWith("/api")) {
         // @ts-ignore
-        return new Response(Bun.file(path.join(staticPath, "index.html")));
+        return cacheHeaders(new Response(Bun.file(path.join(staticPath, "index.html"))));
     }
 
     return null;
