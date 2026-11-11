@@ -44,13 +44,13 @@ export function TravelStep({
           />
           {travelTooEarly && (
             <span className="mt-1 block text-[11px] text-brand-deep">
-              出行日期需要晚于最后一天递签。
+              出发日期必须晚于您选择的最后一个递签日期。
             </span>
           )}
         </label>
 
         <label className="block">
-          <span className="text-xs font-semibold text-[#6f5b4b]">计划行程长度</span>
+          <span className="text-xs font-semibold text-[#6f5b4b]">预计停留天数</span>
           <div className="mt-1.5 flex items-center gap-2">
             <input
               type="number"
@@ -63,14 +63,14 @@ export function TravelStep({
             <span className="text-sm text-ink-soft">天</span>
           </div>
           {tripInvalid && (
-            <span className="mt-1 block text-[11px] text-brand-deep">行程天数需在 1 到 180 天之间。</span>
+            <span className="mt-1 block text-[11px] text-brand-deep">停留天数需在 1 至 180 天之间。</span>
           )}
         </label>
       </div>
 
       <div className="mt-5 space-y-1.5 rounded-[20px] bg-paper-3/60 p-4 text-xs leading-relaxed text-ink-soft">
-        <p>* 如您未明确，可以写一个大概的日期，后续我们会与您沟通材料相关事宜</p>
-        <p>* 请主动确认预定出发日期与递签日期之间有足够的时间用于等待出签</p>
+        <p>* 若行程未定，可先填大致日期，后续专员将与您核对。</p>
+        <p>* 请确保递签日与出发日之间预留充足的使馆审理时间。</p>
       </div>
     </StepCard>
   )

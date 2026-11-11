@@ -25,11 +25,11 @@ export function ExtrasStep({
       icon={Ticket}
       title="附加材料"
       subtitle="按需添加。"
-      hint="预订单由我们出具，实际机票与酒店请自行预订。"
+      hint="仅提供送签专用的行程预订单，出签后的实际机酒请自行预订。"
     >
       <div className="mb-3 flex items-center justify-between gap-3 rounded-[20px] bg-paper-3/70 px-4 py-3">
         <div>
-          <p className="text-sm font-semibold text-ink">主要预订单</p>
+          <p className="text-sm font-semibold text-ink">机酒预订单</p>
         </div>
         <button
           type="button"
@@ -41,7 +41,7 @@ export function ExtrasStep({
               : "bg-brand text-[#fff8f1] shadow-sm shadow-brand/30 hover:bg-brand-deep",
           )}
         >
-          {both ? "全部移除" : `两个都加 ${symbol}${bothPrice}`}
+          {both ? "全部移除" : `机酒打包加购 ${symbol}${bothPrice}`}
         </button>
       </div>
 
@@ -111,7 +111,7 @@ function ExtraRow({
       <button
         type="button"
         onClick={onToggle}
-        aria-label={added ? `移除${name}` : `添加${name}`}
+        aria-label={added ? `取消${name}` : `加购${name}`}
         aria-pressed={added}
         className={cn(
           "grid size-9 shrink-0 place-items-center rounded-full transition",

@@ -17,9 +17,9 @@ export function SlotSupportStep({
   return (
     <StepCard
       icon={RefreshCw}
-      title="刷位意愿"
-      subtitle="当您想预约的位置需要刷位抢订时，是否接受额外的支出。"
-      hint="刷位是在放位时自动抢订，额外费用后续结算。"
+      title="加急抢号服务"
+      subtitle="若所选日期常规号源已满，是否开启系统全天候监控抢号？"
+      hint="抢号成功后将产生额外服务费，届时再行结算（未抢到不收费）。"
     >
       <div className="grid gap-3 sm:grid-cols-3">
         {VISA_SLOT_SUPPORT_OPTIONS.map((option) => {

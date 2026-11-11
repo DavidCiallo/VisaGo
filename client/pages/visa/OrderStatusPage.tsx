@@ -102,7 +102,7 @@ export function OrderStatusPage() {
         setPayOpen(fresh)
         return
       }
-      setError(res.message || "找不到这个订单")
+      setError(res.message || "未查询到相关订单")
     }
 
     load()
@@ -118,7 +118,7 @@ export function OrderStatusPage() {
         <VisaHeader />
         <main className="mx-auto w-full max-w-2xl flex-1 px-5 py-16 text-center">
           <h1 className="text-2xl font-extrabold tracking-tight">
-            {needsIdentity ? "确认身份后查看订单" : "这个链接打不开"}
+            {needsIdentity ? "确认身份后查看订单" : "链接已失效或不存在"}
           </h1>
           <p className="mt-2 text-sm text-ink-soft">{error}</p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
@@ -208,7 +208,7 @@ export function OrderStatusPage() {
     const res = await visaApi.removeTraveler({ token, index, auth: orderKey })
     if (res.success && res.data?.order) {
       setOrder(res.data.order)
-      toast.success("已移除这一位出行人")
+      toast.success("已删除该出行人")
       return
     }
     toast.error(res.message || "移除失败")
@@ -301,8 +301,8 @@ export function OrderStatusPage() {
               <dd>{extras || "无"}</dd>
             </div>
             <div className="flex justify-between gap-3">
-              <dt className="text-ink-soft">刷位</dt>
-              <dd>{VISA_SLOT_SUPPORT_LABELS[order.slot_support] ?? "视情况"}</dd>
+              <dt className="text-ink-soft">加急抢号</dt>
+              <dd>{VISA_SLOT_SUPPORT_LABELS[order.slot_support] ?? "视号源而定"}</dd>
             </div>
             {order.appointment_note && (
               <div className="flex justify-between gap-3">
@@ -393,7 +393,7 @@ export function OrderStatusPage() {
               })}
             </div>
 
-            <p className="mt-4 text-xs font-semibold text-[#6f5b4b]">刷位意愿</p>
+            <p className="mt-4 text-xs font-semibold text-[#6f5b4b]">加急抢号</p>
             <div className="mt-1.5 grid gap-2 sm:grid-cols-3">
               {VISA_SLOT_SUPPORT_OPTIONS.map((option) => (
                 <button
@@ -467,7 +467,7 @@ export function OrderStatusPage() {
 
             {!payCode ? (
               <p className="mt-3 text-xs text-ink-soft">
-                收款方式暂时不可用，我们会与您商议代付事宜。
+                线上支付通道维护中，签证专员将联系您协助完成支付。
               </p>
             ) : (
               <>
@@ -475,7 +475,7 @@ export function OrderStatusPage() {
                   <div className="mt-3 flex flex-col items-center">
                     <img
                       src={payCode.url}
-                      alt="收款码"
+                      alt="微信支付二维码"
                       className="size-52 rounded-2xl bg-white p-2 ring-1 ring-line"
                     />
                     {payCode.label && (
@@ -484,7 +484,7 @@ export function OrderStatusPage() {
                   </div>
                 )}
                 <p className="mt-3 text-xs text-ink-soft">
-                  若您已支付，请耐心等待系统确认。
+                  如已支付，系统正在核验入账，请稍候。
                 </p>
               </>
             )}
@@ -534,8 +534,8 @@ export function OrderStatusPage() {
                     <button
                       type="button"
                       onClick={() => removeTraveler(index)}
-                      title="移除这一位"
-                      aria-label={`移除第 ${index + 1} 位出行人`}
+                      title="删除该出行人"
+                      aria-label={`删除第 ${index + 1} 位出行人`}
                       className="grid size-4 shrink-0 place-items-center rounded-full transition hover:bg-black/10"
                     >
                       <X className="size-3" />
@@ -551,7 +551,7 @@ export function OrderStatusPage() {
           ) : (
             <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
               <span className="text-ink-soft">
-                {uploading ? "正在识别…" : "点任一位可重新扫描护照。"}
+                {uploading ? "正在识别…" : "点击任意出行人，可修改或重新上传护照。"}
               </span>
               {order.travelers < MAX_TRAVELERS && (
                 <button
@@ -609,7 +609,7 @@ export function OrderStatusPage() {
           </div>
 
           <div className="mt-4 border-t border-line pt-4">
-            <p className="text-xs text-ink-soft">同行人凭这个链接填写护照。</p>
+            <p className="text-xs text-ink-soft">发送链接给同行人，对方可直接补交护照信息。</p>
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <input
                 readOnly
@@ -631,7 +631,7 @@ export function OrderStatusPage() {
           <div className="mt-4 rounded-[28px] border border-line bg-paper-2 p-5 shadow-[0_18px_40px_-32px_rgba(88,61,43,0.55)]">
             <p className="text-sm font-bold text-ink">预约进度</p>
             <div className="mt-3 flex justify-between gap-3 text-sm">
-              <span className="text-ink-soft">预约到的位置</span>
+              <span className="text-ink-soft">已约递签时间</span>
               <span className="text-right">{order.position || "待安排"}</span>
             </div>
 

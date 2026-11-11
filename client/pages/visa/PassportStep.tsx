@@ -126,7 +126,7 @@ export function PassportStep({
     <StepCard
       icon={ScanLine}
       title="护照信息"
-      subtitle={travelerCount > 1 ? `${travelerCount} 位出行人各填一份。` : "扫描护照首页自动识别。"}
+      subtitle={travelerCount > 1 ? `${travelerCount} 位出行人各填一份。` : "上传护照照片，自动识别信息"}
     >
       {travelerCount > 1 && (
         <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -160,7 +160,7 @@ export function PassportStep({
         <>
           <div className={amberBox}>
             <Info className="mt-0.5 size-4 shrink-0" />
-            <span>只需要有护照号的那一页。</span>
+            <span>请上传带个人照片与护照号的信息页</span>
           </div>
 
           <div
@@ -211,7 +211,7 @@ export function PassportStep({
             )}
             <div className="visa-scanline absolute inset-x-0 top-0 h-0.5 bg-brand shadow-[0_0_14px_3px_rgba(194,91,63,0.45)]" />
           </div>
-          <p className="mt-3 text-center text-sm font-semibold text-ink">正在读取…</p>
+          <p className="mt-3 text-center text-sm font-semibold text-ink">正在识别…</p>
         </div>
       )}
 
@@ -330,7 +330,7 @@ export function PassportStep({
 
           {travelerCount > 1 && (
             <p className="mt-3 text-xs text-ink-soft/70">
-              其余可下单后补交。
+              其余信息可下单后补齐。
             </p>
           )}
         </div>

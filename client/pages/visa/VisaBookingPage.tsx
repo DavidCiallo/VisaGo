@@ -37,7 +37,7 @@ const STEPS = [
   "附加服务",
   "护照信息",
   "递签日期",
-  "刷位意愿",
+  "加急抢号",
   "出行计划",
   "确认订单",
 ]
@@ -266,7 +266,7 @@ export function VisaBookingPage() {
       const savedStep = Number(draft.step ?? 0)
       const offset = draft.version === 2 ? 0 : 1
       setStep(Math.min(Math.max(savedStep - offset, 0), STEPS.length - 1))
-      toast("已恢复上次未完成的预定", "info", {
+      toast("已恢复上次未完成的订单", "info", {
         label: "重新开始",
         onClick: () => reset(),
       })
@@ -345,7 +345,7 @@ export function VisaBookingPage() {
   async function checkEmail() {
     const value = email.trim()
     if (!EMAIL_PATTERN.test(value)) {
-      setIdentityError("请填写正确的邮箱")
+      setIdentityError("请输入有效的电子邮箱地址")
       return
     }
 
@@ -367,7 +367,7 @@ export function VisaBookingPage() {
   async function verifyIdentity() {
     const name = customerName.trim()
     if (!name) {
-      setIdentityError(emailExists ? "请输入登记的姓名" : "请设置姓名")
+      setIdentityError(emailExists ? "请输入下单时登记的姓名" : "请填写您的姓名")
       return
     }
 
@@ -377,7 +377,7 @@ export function VisaBookingPage() {
     setPhase("name")
 
     if (!(res.success && res.data?.ok)) {
-      setIdentityError(res.message || "姓名和这个邮箱对不上")
+      setIdentityError(res.message || "姓名与邮箱不匹配，请核对后重试")
       return
     }
 
@@ -822,7 +822,7 @@ export function VisaBookingPage() {
                 {submitting
                   ? "正在保存…"
                   : step === 7
-                    ? "确认预定"
+                    ? "确认预订"
                     : "继续"}
                 {!submitting && (
                   <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
@@ -876,7 +876,7 @@ function BookingSuccess({ order, payCode }: { order: VisaOrderDTO; payCode: Visa
         </span>
       </div>
 
-      <h1 className="mt-6 text-3xl font-extrabold tracking-tight text-ink">预定成功！</h1>
+      <h1 className="mt-6 text-3xl font-extrabold tracking-tight text-ink">预订成功！</h1>
       <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-ink-soft">
         前往{order.country_name}的申请已保存，签证专员将核对材料并预约递签。
       </p>
@@ -1002,11 +1002,11 @@ function BookingSuccess({ order, payCode }: { order: VisaOrderDTO; payCode: Visa
           >
             <p className="text-base font-bold text-ink">扫码付款</p>
             <p className="mt-1 text-xs leading-relaxed text-ink-soft">
-              可截图或长按保存后使用微信扫码支付。
+              请使用微信扫码，或长按/截图保存二维码至微信内完成支付。
             </p>
             <img
               src={payCode.url}
-              alt="收款码"
+              alt="微信支付二维码"
               className="mx-auto mt-4 w-44 rounded-2xl bg-white object-contain"
             />
             <p className="mt-3 text-2xl font-extrabold text-brand">

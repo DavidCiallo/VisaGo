@@ -82,8 +82,7 @@ export function TravelersStep({
     <StepCard
       icon={Pencil}
       title="出行人数"
-      subtitle="每人一份独立申请。"
-      hint="每人一份申请表与递签时段。"
+      subtitle="按实际办签人数选择，每人均享独立申请表与专属递签号。"
     >
       <div className="mx-auto grid max-w-md grid-cols-2 gap-3">
         {Array.from({ length: MAX_TRAVELERS }, (_, index) => index + 1).map((count) => {
@@ -145,7 +144,7 @@ export function TravelerStepper({
     >
       <button
         type="button"
-        aria-label="减少一位出行人"
+        aria-label="减少出行人"
         onClick={() => onChange(Math.max(1, travelers - 1))}
         disabled={travelers <= 1}
         className="grid size-8 place-items-center rounded-full text-ink-soft transition hover:bg-paper-3 disabled:opacity-40"
@@ -155,7 +154,7 @@ export function TravelerStepper({
       <span className="w-6 text-center text-sm font-bold text-ink">{travelers}</span>
       <button
         type="button"
-        aria-label="增加一位出行人"
+        aria-label="添加出行人"
         onClick={() => onChange(Math.min(MAX_TRAVELERS, travelers + 1))}
         disabled={travelers >= MAX_TRAVELERS}
         className="grid size-8 place-items-center rounded-full bg-brand text-[#fff8f1] shadow-sm shadow-brand/30 transition hover:bg-brand-deep disabled:opacity-40"

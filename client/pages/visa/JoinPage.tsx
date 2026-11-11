@@ -51,7 +51,7 @@ export function JoinPage() {
       setOrder(res.data.order)
       return
     }
-    setError(res.message || "邀请链接无效，请向你的同行人确认")
+    setError(res.message || "邀请链接已失效，请联系订单发起人重新获取")
   }
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export function JoinPage() {
         setOrder(res.data.order)
         return
       }
-      setError(res.message || "邀请链接无效，请向你的同行人确认")
+      setError(res.message || "邀请链接已失效，请联系订单发起人重新获取")
     })
     return () => {
       alive = false
@@ -128,7 +128,7 @@ export function JoinPage() {
       <div className="flex min-h-screen flex-col bg-paper text-ink">
         <VisaHeader />
         <main className="mx-auto w-full max-w-2xl flex-1 px-5 py-16 text-center">
-          <h1 className="text-2xl font-extrabold tracking-tight">这个链接打不开</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight">链接已失效或不存在</h1>
           <p className="mt-2 text-sm text-ink-soft">{error}</p>
           <Link
             to="/"
@@ -212,7 +212,7 @@ export function JoinPage() {
                 disabled={submitting}
                 className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-[#fff8f1] shadow-lg shadow-brand/25 transition hover:bg-brand-deep disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {submitting ? "提交中…" : "保存这一位"}
+                {submitting ? "提交中…" : "保存信息"}
               </button>
             </div>
           </>
@@ -236,7 +236,7 @@ export function JoinPage() {
                     </span>
                   </p>
                   {slot.mine && (
-                    <p className="mt-0.5 text-[11px] text-ink-soft">这一份是你填的</p>
+                    <p className="mt-0.5 text-[11px] text-ink-soft">由您本机填写</p>
                   )}
                 </div>
 
@@ -279,7 +279,7 @@ export function JoinPage() {
 
             {mine.length > 0 && (
               <p className="pt-1 text-[11px] leading-snug text-ink-soft">
-                换设备就看不到这一份了。
+                为保护隐私，更换设备或浏览器后将隐藏您已填的信息。
               </p>
             )}
           </div>

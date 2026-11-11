@@ -113,7 +113,7 @@ export const VISA_SLOT_SUPPORT_OPTIONS: VisaSlotSupportOption[] = [
     {
         key: "allow",
         label: "允许",
-        desc: "位置紧张时可以直接刷位，额外费用后续结算。",
+        desc: "位置紧张时可以直接加急抢号，额外费用后续结算。",
     },
     {
         key: "maybe",
@@ -123,7 +123,7 @@ export const VISA_SLOT_SUPPORT_OPTIONS: VisaSlotSupportOption[] = [
     {
         key: "deny",
         label: "禁止",
-        desc: "预留时间充裕，可以等待放位而无须刷位。",
+        desc: "预留时间充裕，可以等待放号而无须加急抢号。",
     },
 ];
 

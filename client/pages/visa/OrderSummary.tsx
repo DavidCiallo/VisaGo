@@ -136,7 +136,7 @@ export function OrderSummary({
 
           <div className="mt-4 flex gap-2 rounded-2xl bg-mint/10 p-3 text-xs leading-relaxed text-[#4f5c3f]">
             <ShieldCheck className="mt-0.5 size-4 shrink-0" />
-            <span>如果没能约到递签日期，全额退款。</span>
+            <span>若未能约到所选递签日期，全额退款。</span>
           </div>
         </div>
       </div>
@@ -158,7 +158,7 @@ export function OrderSummary({
               </p>
             )}
             {appointmentNote && <p>备注：{appointmentNote}</p>}
-            <p>刷位：{VISA_SLOT_SUPPORT_LABELS[slotSupport]}</p>
+            <p>加急抢号：{VISA_SLOT_SUPPORT_LABELS[slotSupport]}</p>
           </div>
         </div>
       )}

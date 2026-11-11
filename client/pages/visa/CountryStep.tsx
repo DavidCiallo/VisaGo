@@ -98,7 +98,7 @@ export function CountryStep({
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
-            先选一个目的地
+            选择目的地国家
           </h1>
           <p className="mt-1.5 text-sm text-ink-soft">
             价格按人计算（{origin?.label}出发）。

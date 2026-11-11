@@ -6,18 +6,18 @@ import { VisaFooter, VisaHeader } from "@/client/components/visa/VisaHeader"
 const features = [
   {
     icon: ScanLine,
-    title: "扫护照",
-    desc: "扫首页，信息自动填好。",
+    title: "拍护照",
+    desc: "拍照上传，信息自动录入。",
   },
   {
     icon: FileCheck2,
-    title: "机票酒店",
-    desc: "预订单一起准备好。",
+    title: "机酒预订单",
+    desc: "送签专用的机票酒店预订单，一键配齐。",
   },
   {
     icon: CalendarClock,
     title: "递签日期",
-    desc: "选能去的日子，我们来排期。",
+    desc: "勾选您方便的日子，我们为您预约。",
   },
 ]
 

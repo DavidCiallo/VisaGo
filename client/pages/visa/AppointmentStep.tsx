@@ -62,7 +62,7 @@ export function AppointmentStep({
       icon={CalendarDays}
       title="选择递签日期"
       subtitle={`${visaCenter} · 可多选`}
-      hint="灰色为材料组尚未排到的日期，橙色为材料紧张的一周。"
+      hint="灰色日期暂未开放或名额已满；橙色日期制作周期紧张，不建议选择。"
     >
       <p className="text-xs font-semibold text-[#6f5b4b]">递签城市</p>
       <div className="mt-2 flex flex-wrap gap-2">
@@ -102,19 +102,19 @@ export function AppointmentStep({
             {openCount === 0 && (
               <p className="mt-2 text-xs font-medium text-brand-deep">
                 {available.length + caution.length === 0
-                  ? "这个中心暂时没有可约日期。"
-                  : "近期日期不可选，往后翻。"}
+                  ? "该签证中心暂未开放可约号源。"
+                  : "近期名额已满，请往后翻看其他月份。"}
               </p>
             )}
 
             <div className="mt-3 flex flex-wrap items-center gap-3 text-[11px] text-ink-soft">
               <span className="flex items-center gap-1.5">
                 <i className="size-2.5 rounded-full bg-[#e8f0dc]" />
-                可选
+                可预约
               </span>
               <span className="flex items-center gap-1.5">
                 <i className="size-2.5 rounded-full bg-[#fbe3cd]" />
-                不建议选
+                档期紧张
               </span>
               <span className="flex items-center gap-1.5">
                 <i className="size-2.5 rounded-full border border-line bg-paper-2" />
@@ -125,7 +125,7 @@ export function AppointmentStep({
 
           <div className="mt-4 flex flex-wrap items-center gap-1.5 text-xs sm:gap-2">
             <span className="text-ink-soft">
-              {selected.length ? `已选 ${selected.length} 天` : "还没有选择日期"}
+              {selected.length ? `已选 ${selected.length} 天` : "请选择递签日期"}
             </span>
             {selected.map((iso) => (
               <span
@@ -137,7 +137,7 @@ export function AppointmentStep({
             ))}
           </div>
           <p className="mt-2 text-[11px] text-ink-soft/70">
-            * 位置并非实时数据，建议多选几天。
+            * 使馆号源实时变动，建议多选几个备选日期以提高预约成功率。
           </p>
         </>
       ) : null}
