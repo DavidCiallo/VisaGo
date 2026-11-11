@@ -12,7 +12,9 @@ import { findCountry, MAX_TRAVELERS, quoteVisa } from "../../../shared/modules/v
 import {
     buildDefaultSettings,
     currencyOf,
+    feeOf,
     findDestination,
+    findOrigin,
     materialsPlan,
     normalizeSettings,
     type VisaMaterials,
@@ -524,7 +526,13 @@ export class VisaService {
         const tooEarly = req.appointment_dates.find((date) => date < plan.firstDate);
         if (tooEarly) throw new Error(`材料组排期未到，最早可选 ${plan.firstDate}`);
 
-        const quote = quoteVisa(destination.price, req.travelers, req.flight, req.hotel);
+        const quote = quoteVisa(
+            destination.price,
+            req.travelers,
+            req.flight,
+            req.hotel,
+            feeOf(findOrigin(settings, req.origin_code)),
+        );
 
         return await visaOrderRepository.insert({
             invite_token: Math.random().toString(36).slice(2, 10),
@@ -583,7 +591,14 @@ export class VisaService {
             if (latest && req.travel_date <= latest) throw new Error("出行日期需晚于递签日期");
         }
 
-        const quote = quoteVisa(0, order.travelers, req.flight, req.hotel);
+        const settings = await this.getSettings();
+        const quote = quoteVisa(
+            0,
+            order.travelers,
+            req.flight,
+            req.hotel,
+            feeOf(findOrigin(settings, order.origin_code)),
+        );
         await visaOrderRepository.update(
             { id: order.id },
             {
@@ -594,7 +609,7 @@ export class VisaService {
                 appointment_note: req.appointment_note,
                 slot_support: req.slot_support,
                 extras_fee: quote.extrasFee,
-                total: order.service_fee + quote.extrasFee,
+                total: order.visa_fee + order.service_fee + quote.extrasFee + quote.fee,
                 update_time: Date.now(),
             },
         );
@@ -663,7 +678,13 @@ export class VisaService {
             ...order.passports,
             toPassportDetails({}),
         ];
-        const quote = quoteVisa(destination?.price ?? 0, travelers, order.flight, order.hotel);
+        const quote = quoteVisa(
+            destination?.price ?? 0,
+            travelers,
+            order.flight,
+            order.hotel,
+            feeOf(findOrigin(settings, order.origin_code)),
+        );
 
         await visaOrderRepository.update(
             { id: order.id },
@@ -693,7 +714,13 @@ export class VisaService {
         const destination = findDestination(settings, order.origin_code, order.country_code);
         const travelers = order.travelers - 1;
         const passports = order.passports.filter((_, i) => i !== index);
-        const quote = quoteVisa(destination?.price ?? 0, travelers, order.flight, order.hotel);
+        const quote = quoteVisa(
+            destination?.price ?? 0,
+            travelers,
+            order.flight,
+            order.hotel,
+            feeOf(findOrigin(settings, order.origin_code)),
+        );
 
         await visaOrderRepository.update(
             { id: order.id },

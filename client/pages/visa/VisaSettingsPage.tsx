@@ -144,6 +144,18 @@ export function VisaSettingsPage() {
     })
   }
 
+  function updateFee(value: number) {
+    setSettings((current) => {
+      if (!current) return current
+      return {
+        ...current,
+        origins: current.origins.map((item) =>
+          item.code === originCode ? { ...item, fee: Math.max(0, value) } : item,
+        ),
+      }
+    })
+  }
+
   function updateCenter(countryCode: string, index: number, patch: Partial<VisaCenter>) {
     updateDestination(countryCode, (destination) => ({
       ...destination,
@@ -417,6 +429,31 @@ export function VisaSettingsPage() {
                 最早可递签 {plan.firstDate}
               </p>
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {settings && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">代付手续费</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <label className="flex flex-wrap items-center gap-3">
+              <span className="text-muted-foreground text-xs">每人</span>
+              <Input
+                type="number"
+                min={0}
+                step={1}
+                className="h-8 w-24"
+                value={origin?.fee ?? 0}
+                onFocus={(event) => event.target.select()}
+                onChange={(event) => updateFee(Number(event.target.value) || 0)}
+              />
+              <span className="text-muted-foreground text-xs">
+                {currencyOf(originCode).symbol}，跟签证费一起收，为代付产生的汇兑与通道成本
+              </span>
+            </label>
           </CardContent>
         </Card>
       )}

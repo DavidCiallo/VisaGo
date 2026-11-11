@@ -44,6 +44,8 @@ export interface VisaDestination {
 export interface VisaOrigin {
     code: VisaOriginCode;
     label: string;
+    /** 代付签证费的手续费，按人收，币种同出发地；没配就是 0 */
+    fee?: number;
     destinations: Record<string, VisaDestination>;
 }
 
@@ -166,6 +168,7 @@ export function buildDefaultSettings(): VisaSettings {
         origins: (["CN", "UK"] as VisaOriginCode[]).map((code) => ({
             code,
             label: VISA_ORIGIN_LABELS[code],
+            fee: 0,
             destinations: Object.fromEntries(
                 VISA_COUNTRIES.map((country) => [
                     country.code,
@@ -186,6 +189,12 @@ export function buildDefaultSettings(): VisaSettings {
 
 export function findOrigin(settings: VisaSettings, code: string): VisaOrigin | null {
     return settings.origins.find((origin) => origin.code === code) ?? null;
+}
+
+/** 老配置里没有这一项，一律按 0 收 */
+export function feeOf(origin: VisaOrigin | null | undefined): number {
+    const value = Number(origin?.fee);
+    return Number.isFinite(value) && value > 0 ? value : 0;
 }
 
 export function findDestination(
@@ -293,7 +302,13 @@ export function normalizeSettings(input: any): VisaSettings {
             };
         }
 
-        return { code, label: VISA_ORIGIN_LABELS[code], destinations };
+        const rawFee = Number(incoming.fee);
+        return {
+            code,
+            label: VISA_ORIGIN_LABELS[code],
+            fee: Number.isFinite(rawFee) && rawFee > 0 ? Math.round(rawFee * 100) / 100 : 0,
+            destinations,
+        };
     });
 
     // 老数据存的是「堆积份数 ÷ 每天处理量」，换算成工作日；新数据直接读 workdays

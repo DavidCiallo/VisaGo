@@ -78,6 +78,8 @@ export interface VisaQuote {
     extrasFee: number;
     /** 签证费，官方标准，代收 */
     visaFee: number;
+    /** 代付手续费，按人收 */
+    fee: number;
     /** 本单需要支付的金额，含代收的签证费 */
     toPay: number;
 }
@@ -87,16 +89,19 @@ export function quoteVisa(
     travelers: number,
     flight: boolean,
     hotel: boolean,
+    feePerTraveler = 0,
 ): VisaQuote {
     const perTraveler = serviceFeePerTraveler(travelers);
     const extrasPerTraveler = (flight ? VISA_EXTRA_FEE : 0) + (hotel ? VISA_EXTRA_FEE : 0);
     const visaFee = visaPricePerPerson * travelers;
+    const fee = feePerTraveler * travelers;
     return {
         perTraveler,
         serviceFee: perTraveler * travelers,
         extrasFee: extrasPerTraveler * travelers,
         visaFee,
-        toPay: visaFee + perTraveler * travelers + extrasPerTraveler * travelers,
+        fee,
+        toPay: visaFee + perTraveler * travelers + extrasPerTraveler * travelers + fee,
     };
 }
 
