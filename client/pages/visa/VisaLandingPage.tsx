@@ -6,18 +6,18 @@ import { VisaFooter, VisaHeader } from "@/client/components/visa/VisaHeader"
 const features = [
   {
     icon: ScanLine,
-    title: "护照扫描",
-    desc: "识别护照首页，自动填表。",
+    title: "扫护照",
+    desc: "扫首页，信息自动填好。",
   },
   {
     icon: FileCheck2,
-    title: "附加材料",
-    desc: "机票与酒店预订单随申请一并准备。",
+    title: "机票酒店",
+    desc: "预订单一起准备好。",
   },
   {
     icon: CalendarClock,
     title: "递签日期",
-    desc: "按中心档期多选，由我们协调。",
+    desc: "选能去的日子，我们来排期。",
   },
 ]
 
@@ -41,10 +41,10 @@ export function VisaLandingPage() {
 
       <main className="relative mx-auto w-full max-w-3xl flex-1 px-5 pb-20 pt-16 text-center sm:pt-20">
         <h1 className="mt-6 text-balance text-4xl font-extrabold leading-[1.1] tracking-tight text-ink sm:text-5xl lg:text-6xl">
-          今天开始您的签证申请
+          签证申请，线上办
         </h1>
         <p className="mx-auto mt-5 max-w-xl text-balance text-base leading-relaxed text-ink-soft sm:text-lg">
-          材料准备与递签预约，我们一次办妥。
+          填好资料，剩下的我们来做。
         </p>
 
         <Link
@@ -66,7 +66,7 @@ export function VisaLandingPage() {
           <div className="mt-4 flex-1 sm:mt-0">
             <h2 className="font-bold text-ink">出发日期未定？</h2>
             <p className="mt-1 text-sm leading-relaxed text-ink-soft">
-              先选国家与递签日期，护照信息稍后补交。
+              先选国家和递签日期，护照信息可以晚点补。
             </p>
           </div>
           <Link

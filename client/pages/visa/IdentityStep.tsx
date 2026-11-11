@@ -106,7 +106,7 @@ export function IdentityStep({
               type="email"
               value={email}
               onChange={(event) => onChange({ email: event.target.value })}
-              placeholder="您的联系邮箱"
+              placeholder="邮箱"
               className="h-12 w-full rounded-full border border-line bg-paper-3/70 px-5 text-sm text-ink placeholder:text-ink-soft/60 focus:border-brand/50 focus:bg-paper-2 focus:outline-none focus:ring-4 focus:ring-brand/10"
             />
           )}
@@ -115,7 +115,7 @@ export function IdentityStep({
             <input
               value={name}
               onChange={(event) => onChange({ name: event.target.value })}
-              placeholder={exists ? "请输入登记的姓名" : "设置姓名（中文）"}
+              placeholder={exists ? "登记过的姓名" : "姓名（中文）"}
               maxLength={20}
               className="h-12 w-full rounded-full border border-line bg-paper-3/70 px-5 text-sm text-ink placeholder:text-ink-soft/60 focus:border-brand/50 focus:bg-paper-2 focus:outline-none focus:ring-4 focus:ring-brand/10"
             />
