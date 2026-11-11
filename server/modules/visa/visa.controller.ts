@@ -276,9 +276,8 @@ async function exportData(request: VisaExportInput) {
 
 async function importData(request: VisaImportInput) {
     requireLogin(request);
-    const mode = request?.mode === "replace" ? "replace" : "merge";
 
-    return await VisaService.importAll(request?.backup, mode);
+    return await VisaService.importAll(request?.backup);
 }
 
 export const visaMount = {

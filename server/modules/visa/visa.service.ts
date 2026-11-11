@@ -365,7 +365,8 @@ export class VisaService {
         };
     }
 
-    static async importAll(backup: any, mode: string) {
+    /** 导入就是整库替换：先清空，再按备份写回。 */
+    static async importAll(backup: any) {
         if (!backup || !Array.isArray(backup.orders) || !Array.isArray(backup.customers)) {
             throw new Error("文件内容不对，应为本系统导出的备份");
         }
@@ -375,11 +376,9 @@ export class VisaService {
         const files =
             backup.files && typeof backup.files === "object" ? (backup.files as Record<string, string>) : {};
 
-        if (mode === "replace") {
-            await visaOrderRepository.truncate();
-            await visaCustomerRepository.truncate();
-            await visaPayCodeRepository.truncate();
-        }
+        await visaOrderRepository.truncate();
+        await visaCustomerRepository.truncate();
+        await visaPayCodeRepository.truncate();
 
         // 先把文件放回去，订单和收款码打开才有图
         let filesIn = 0;
@@ -399,7 +398,6 @@ export class VisaService {
         let payCodesIn = 0;
         for (const row of payCodes) {
             if (!row?.image_id) continue;
-            if (mode === "merge" && (await visaPayCodeRepository.findOne({ id: row.id }))) continue;
             await visaPayCodeRepository.insert({
                 id: row.id,
                 amount: Number(row.amount) || 0,
@@ -414,16 +412,12 @@ export class VisaService {
 
         let customersIn = 0;
         for (const row of customers) {
-            if (mode === "merge" && (await visaCustomerRepository.findOne({ email: row.email }))) continue;
             await visaCustomerRepository.insert({ email: row.email, name: String(row.name ?? "") });
             customersIn += 1;
         }
 
         let ordersIn = 0;
         for (const row of orders) {
-            if (mode === "merge" && (await visaOrderRepository.findOne({ invite_token: row.invite_token }))) {
-                continue;
-            }
             await visaOrderRepository.insert(row);
             ordersIn += 1;
         }

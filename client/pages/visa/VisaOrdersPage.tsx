@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react"
-import { Download, RefreshCw, Search, Upload } from "lucide-react"
+import { RefreshCw, Search, Upload } from "lucide-react"
 
 import { Badge } from "@/client/components/ui/badge"
 import { Button } from "@/client/components/ui/button"
@@ -30,7 +30,6 @@ import {
   type VisaOriginCode,
 } from "@/shared/modules/visa/visa.settings"
 import type { VisaOrderDTO } from "@/shared/modules/visa/visa.entity"
-import type { VisaBackup } from "@/shared/modules/visa/visa.interface"
 
 const STATUS_LABELS: Record<string, string> = {
   new: "待处理",
@@ -73,63 +72,6 @@ export function VisaOrdersPage() {
   const [positionDraft, setPositionDraft] = useState("")
   const [attaching, setAttaching] = useState(false)
   const letterInput = useRef<HTMLInputElement>(null)
-  const [pending, setPending] = useState<VisaBackup | null>(null)
-  const [importing, setImporting] = useState(false)
-  const fileInput = useRef<HTMLInputElement>(null)
-
-  async function exportData() {
-    const res = await visaApi.exportData({ auth: getAuth() })
-    if (!res.success || !res.data?.backup) {
-      toast.error(res.message || "导出失败")
-      return
-    }
-
-    const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-")
-    const blob = new Blob([JSON.stringify(res.data.backup, null, 2)], {
-      type: "application/json",
-    })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.href = url
-    link.download = `visago-${stamp}.json`
-    link.click()
-    URL.revokeObjectURL(url)
-    toast.success("已导出")
-  }
-
-  function pickFile(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0]
-    event.target.value = ""
-    if (!file) return
-
-    file.text().then((text) => {
-      try {
-        const parsed = JSON.parse(text) as VisaBackup
-        if (!Array.isArray(parsed.orders)) throw new Error("bad")
-        setPending(parsed)
-      } catch {
-        toast.error("这个文件不是本系统导出的备份")
-      }
-    })
-  }
-
-  async function runImport(mode: "merge" | "replace") {
-    if (!pending) return
-    setImporting(true)
-    const res = await visaApi.importData({ backup: pending, mode, auth: getAuth() })
-    setImporting(false)
-
-    if (!res.success) {
-      toast.error(res.message || "导入失败")
-      return
-    }
-    const counts = res.data
-    setPending(null)
-    toast.success(
-      `已导入 ${counts?.orders ?? 0} 单、${counts?.customers ?? 0} 位客户、${counts?.pay_codes ?? 0} 张收款码、${counts?.files ?? 0} 个文件`,
-    )
-    await load()
-  }
 
   async function load() {
     setLoading(true)
@@ -245,55 +187,12 @@ export function VisaOrdersPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" onClick={() => fileInput.current?.click()}>
-            <Upload className="size-4" />
-            导入
-          </Button>
-          <Button variant="outline" onClick={exportData}>
-            <Download className="size-4" />
-            导出
-          </Button>
           <Button variant="outline" onClick={load} disabled={loading}>
             <RefreshCw className={loading ? "size-4 animate-spin" : "size-4"} />
             刷新
           </Button>
         </div>
       </div>
-
-      <input
-        ref={fileInput}
-        type="file"
-        accept="application/json,.json"
-        className="hidden"
-        onChange={pickFile}
-      />
-
-      <Dialog open={Boolean(pending)} onOpenChange={(open) => !open && setPending(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>导入备份</DialogTitle>
-            <DialogDescription>
-              {pending
-                ? `${pending.orders.length} 个订单、${pending.customers.length} 位客户。`
-                : ""}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-wrap justify-end gap-2">
-            <Button variant="outline" onClick={() => setPending(null)} disabled={importing}>
-              取消
-            </Button>
-            <Button variant="outline" onClick={() => runImport("merge")} disabled={importing}>
-              只补充新的
-            </Button>
-            <Button onClick={() => runImport("replace")} disabled={importing}>
-              覆盖全部
-            </Button>
-          </div>
-          <p className="text-muted-foreground text-xs">
-            「覆盖全部」会先清空现在的订单、客户和护照照片。
-          </p>
-        </DialogContent>
-      </Dialog>
 
       <div className="flex flex-wrap items-center gap-2">
         <select

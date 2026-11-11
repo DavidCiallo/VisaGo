@@ -490,8 +490,8 @@ export interface VisaExportResponse {
 }
 
 export interface VisaImportInput {
+    /** 导入即整库替换：订单、客户、收款码、配置、文件全部以备份为准 */
     backup: VisaBackup;
-    mode: "merge" | "replace";
     auth?: string;
 }
 
