@@ -44,7 +44,7 @@ export interface VisaDestination {
 export interface VisaOrigin {
     code: VisaOriginCode;
     label: string;
-    /** 代付签证费的手续费，按人收，币种同出发地；没配就是 0 */
+    /** 汇兑磨损，按人收，币种同出发地；没配就是 0 */
     fee?: number;
     destinations: Record<string, VisaDestination>;
 }

@@ -106,7 +106,7 @@ export function OrderSummary({
             </div>
             {quote.fee > 0 && (
               <div className="flex items-center justify-between gap-3">
-                <dt className="text-ink-soft">代付手续费{perTraveler}</dt>
+                <dt className="text-ink-soft">汇兑磨损{perTraveler}</dt>
                 <dd className="font-medium text-ink">
                   {symbol}
                   {quote.fee}

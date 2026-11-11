@@ -78,7 +78,7 @@ export interface VisaQuote {
     extrasFee: number;
     /** 签证费，官方标准，代收 */
     visaFee: number;
-    /** 代付手续费，按人收 */
+    /** 汇兑磨损，按人收 */
     fee: number;
     /** 本单需要支付的金额，含代收的签证费 */
     toPay: number;

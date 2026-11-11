@@ -436,7 +436,7 @@ export function VisaSettingsPage() {
       {settings && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">代付手续费</CardTitle>
+            <CardTitle className="text-base">汇兑磨损</CardTitle>
           </CardHeader>
           <CardContent>
             <label className="flex flex-wrap items-center gap-3">
@@ -451,7 +451,7 @@ export function VisaSettingsPage() {
                 onChange={(event) => updateFee(Number(event.target.value) || 0)}
               />
               <span className="text-muted-foreground text-xs">
-                {currencyOf(originCode).symbol}，跟签证费一起收，为代付产生的汇兑与通道成本
+                {currencyOf(originCode).symbol}，跟签证费一起收，为代付产生的汇兑与通道损耗
               </span>
             </label>
           </CardContent>
