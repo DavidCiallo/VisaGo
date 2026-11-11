@@ -35,6 +35,18 @@ export function VisaFooter() {
     <footer className="border-t border-line/70 py-8">
       <div className="mx-auto flex max-w-5xl flex-col items-center gap-1 px-5 text-center text-xs text-ink-soft/80">
         <p>© 2026 VisaGo</p>
+        <p>
+          由{" "}
+          <a
+            href="https://noworrytourism.cn"
+            target="_blank"
+            rel="noreferrer"
+            className="underline decoration-line underline-offset-2 transition hover:text-brand"
+          >
+            noworrytourism.cn
+          </a>{" "}
+          提供技术支持
+        </p>
       </div>
     </footer>
   )
