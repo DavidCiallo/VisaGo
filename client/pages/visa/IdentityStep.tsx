@@ -142,77 +142,63 @@ export function IdentityStep({
           onClick={() => setPolicyOpen(true)}
           className="underline decoration-ink-soft/50 underline-offset-2 transition hover:text-brand"
         >
-          隐私协议
+          隐私保护政策
         </button>
       </p>
 
       <Dialog open={policyOpen} onOpenChange={setPolicyOpen}>
         <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>隐私协议</DialogTitle>
-            <DialogDescription>更新日期：2026 年 11 月 11 日</DialogDescription>
+            <DialogTitle>隐私保护政策</DialogTitle>
+            <DialogDescription>更新日期：2026年11月11日</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 text-sm leading-relaxed text-ink">
-            <PolicySection title="一、我们收集哪些信息">
-              <ul className="list-disc space-y-1 pl-5">
-                <li>联系信息：邮箱、姓名。</li>
+            <PolicySection title="一、 信息收集范围">
+              <p>为向您提供签证预约及材料辅助服务，我们仅收集履行服务所必需的信息：</p>
+              <ul className="mt-1 list-disc space-y-1 pl-5">
+                <li>基础联系信息：您的姓名及电子邮箱。</li>
                 <li>
-                  护照信息：护照首页识别后得到的姓名、护照号、出生日期、性别、国籍、出生地、签发日期、有效期。
+                  证件识别信息：通过光学字符识别（OCR）提取的护照首页文本信息，包括姓名、护照号码、出生日期、性别、国籍、出生地、签发日期及有效期。
                 </li>
                 <li>
-                  订单信息：出发地、目的地、出行人数、递签城市与递签日期、计划出行日期与天数、附加服务，以及您填写的备注。
+                  行程与订单信息：出发地、目的地、出行人数、递签城市与日期、计划出行时间、所选附加服务及订单备注。
                 </li>
               </ul>
             </PolicySection>
 
-            <PolicySection title="二、关于护照照片">
-              护照首页照片仅用于当次文字识别，识别完成后即丢弃，不保存、不留副本。系统中只保留识别出的文字信息。
+            <PolicySection title="二、 证件影像安全承诺">
+              您上传的护照首页照片仅用于当次实时信息提取。识别完成后，原始图片将立即从内存及服务器中自动销毁，系统不保存、不留存任何影像副本，仅保留提取后的必要文本数据。
             </PolicySection>
 
-            <PolicySection title="三、信息用途">
-              <ul className="list-disc space-y-1 pl-5">
-                <li>核对身份，查找并展示您的订单。</li>
-                <li>准备申请材料，代为预约递签。</li>
-                <li>就预约进度与签证中心或使领馆沟通。</li>
-                <li>在必要时通过邮箱与您联系。</li>
+            <PolicySection title="三、 信息使用目的">
+              <p>我们收集的上述信息仅用于以下明确用途：</p>
+              <ul className="mt-1 list-disc space-y-1 pl-5">
+                <li>核验客户身份，查询及展示订单状态；</li>
+                <li>辅助生成签证申请材料，并代为完成递签预约；</li>
+                <li>就预约及办理进度与相关签证中心或使领馆进行必要沟通；</li>
+                <li>在服务关键节点或异常情况下，通过电子邮箱与您取得联系。</li>
               </ul>
             </PolicySection>
 
-            <PolicySection title="四、支付">
-              页面展示的收款码由我们提供，您在微信或支付宝内自行完成支付。我们不收集您的银行卡号、支付账户或支付密码。
+            <PolicySection title="四、 支付与交易安全">
+              本平台通过微信支付、支付宝等官方合规渠道完成订单结算。支付过程由您在对应支付平台内独立完成，我们不会收集、接触或存储您的银行卡号、支付账户及支付密码等敏感金融信息。
             </PolicySection>
 
-            <PolicySection title="五、第三方">
-              <ul className="list-disc space-y-1 pl-5">
-                <li>阿里云文字识别服务：仅将您上传的图片用于文字识别。</li>
-                <li>签证中心及使领馆：为预约递签，需按对方要求提交申请材料。</li>
+            <PolicySection title="五、 信息共享与第三方服务">
+              <p>除以下必要场景及法律法规要求外，我们绝不会向任何第三方出售、出租或共享您的个人信息：</p>
+              <ul className="mt-1 list-disc space-y-1 pl-5">
+                <li>
+                  技术服务商：为实现证件自动录入，图片数据将通过加密通道传输至具备安全资质的云服务商（阿里云）仅作实时文字识别处理。
+                </li>
+                <li>
+                  官方机构：为完成递签预约，我们需按相关签证中心及使领馆的官方要求，代您提交必要的申请材料。
+                </li>
               </ul>
-              除上述情形以及法律法规要求外，我们不会向第三方提供您的个人信息。
             </PolicySection>
 
-            <PolicySection title="六、保存期限">
-              订单办理完成后，或您要求删除时，我们删除相应的个人信息；法律法规另有保存要求的除外。
-            </PolicySection>
-
-            <PolicySection title="七、您的权利">
-              您可以查询、更正、复制、删除您的个人信息，也可以撤回同意。如需行使上述权利，请通过网站下方的联系方式与我们联系，我们将在十五个工作日内答复。
-            </PolicySection>
-
-            <PolicySection title="八、信息安全">
-              我们采取访问控制、传输加密、定期备份等措施保护您的信息。发生可能影响您权益的安全事件时，我们会及时告知。
-            </PolicySection>
-
-            <PolicySection title="九、未成年人">
-              本服务面向成年人。未满十八周岁的申请人，请由监护人代为办理并同意本协议。
-            </PolicySection>
-
-            <PolicySection title="十、协议更新">
-              协议变更时，我们会在本页面更新并标注日期。继续使用本服务视为接受更新后的协议。
-            </PolicySection>
-
-            <PolicySection title="十一、联系我们">
-              如需咨询或行使上述权利，请通过 noworrytourism.cn 上的联系方式与我们联系。
+            <PolicySection title="六、 数据存储与删除">
+              您的数据仅在订单办理期间予以加密保存。当订单服务完结，或您主动提出删除申请时，我们将立即从系统中永久清除您的相关个人信息（法律法规另有强制留存要求的除外）。
             </PolicySection>
           </div>
         </DialogContent>
