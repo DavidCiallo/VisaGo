@@ -10,7 +10,7 @@ export interface VisaCountry {
 }
 
 export const VISA_GROUPS: { key: VisaGroupKey; label: string }[] = [
-    { key: "europe", label: "法德西" },
+    { key: "europe", label: "西欧" },
     { key: "nordic", label: "北欧" },
     { key: "usa", label: "美国" },
     { key: "asia", label: "日韩越" },
