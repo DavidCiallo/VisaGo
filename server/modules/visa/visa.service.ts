@@ -570,6 +570,7 @@ export class VisaService {
             view_key: nanoid(20),
             customer_email: req.customer_email,
             customer_name: req.customer_name,
+            customer_phone: req.customer_phone,
             origin_code: req.origin_code,
             country_code: req.country_code,
             travelers: req.travelers,

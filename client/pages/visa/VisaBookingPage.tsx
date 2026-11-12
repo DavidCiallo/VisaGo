@@ -65,6 +65,7 @@ interface VisaDraft {
   updated_at?: number
   customer_email: string
   customer_name: string
+  customer_phone: string
   verified: boolean
   origin_code: VisaOriginCode
   country_code: string
@@ -91,6 +92,7 @@ export function VisaBookingPage() {
   const [originCode, setOriginCode] = useState<VisaOriginCode>("CN")
   const [email, setEmail] = useState("")
   const [customerName, setCustomerName] = useState("")
+  const [customerPhone, setCustomerPhone] = useState("")
   const [phase, setPhase] = useState<"email" | "name">("email")
   const [emailExists, setEmailExists] = useState<boolean | null>(null)
   const [verified, setVerified] = useState(false)
@@ -124,6 +126,7 @@ export function VisaBookingPage() {
   const symbol = currencyOf(originCode).symbol
 
   const anyFilled = passports.some((item) => item.first_name.trim() && item.last_name.trim())
+  const phoneValid = /^\+?\d{6,15}$/.test(customerPhone.replace(/[\s-]/g, ""))
   // 从订单页跳过来时带着订单号，验完身份直接回去
   const pendingOrder = (searchParams.get("order") ?? "").trim().toLowerCase()
   const latestAppointment = dates.length ? [...dates].sort()[dates.length - 1] : ""
@@ -140,7 +143,7 @@ export function VisaBookingPage() {
     Boolean(countryCode),
     travelers >= 1,
     true,
-    anyFilled,
+    anyFilled && phoneValid,
     Boolean(city) && dates.length > 0,
     true,
     Boolean(travelDate.trim()) && tripValid && !travelTooEarly,
@@ -246,6 +249,7 @@ export function VisaBookingPage() {
 
       setEmail(draft.customer_email ?? "")
       setCustomerName(draft.customer_name ?? "")
+      setCustomerPhone(draft.customer_phone ?? "")
       setVerified(Boolean(draft.verified))
       setOriginCode(draft.origin_code)
       setCountryCode(draft.country_code)
@@ -285,6 +289,7 @@ export function VisaBookingPage() {
       updated_at: Date.now(),
       customer_email: email,
       customer_name: customerName,
+      customer_phone: customerPhone,
       verified,
       origin_code: originCode,
       country_code: countryCode,
@@ -327,6 +332,7 @@ export function VisaBookingPage() {
       setPhase("email")
       setEmailExists(null)
       setCustomerName("")
+    setCustomerPhone("")
       setIdentityError("")
       setChecking(false)
       return
@@ -466,6 +472,7 @@ export function VisaBookingPage() {
     const res = await visaApi.create({
       customer_email: email.trim(),
       customer_name: customerName.trim(),
+      customer_phone: customerPhone.trim(),
       origin_code: originCode,
       country_code: countryCode,
       travelers,
@@ -748,6 +755,8 @@ export function VisaBookingPage() {
                 passports={passports}
                 onChange={patchPassport}
                 travelerCount={travelers}
+                phone={customerPhone}
+                onPhoneChange={setCustomerPhone}
               />
             )}
 
@@ -796,9 +805,9 @@ export function VisaBookingPage() {
 
           <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/95 px-5 py-2 backdrop-blur-md sm:static sm:mt-5 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
             <div className="mx-auto max-w-5xl">
-              {step === 3 && !anyFilled && (
+              {step === 3 && (!anyFilled || !phoneValid) && (
                 <p className="mb-1 text-right text-[11px] font-medium text-[#a06a2c] sm:mb-2 sm:text-xs">
-                  至少填写一位出行人姓名，其余可下单后补交。
+                  {phoneValid ? "至少填写一位出行人姓名，其余可下单后补交。" : "填写手机号后继续。"}
                 </p>
               )}
               {step === 4 && (!city || !dates.length) && (

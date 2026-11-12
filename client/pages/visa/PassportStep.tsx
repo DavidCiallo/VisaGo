@@ -22,11 +22,16 @@ function filled(passport: PassportDetails | undefined) {
 export function PassportStep({
   passports,
   travelerCount,
+  phone,
   onChange,
+  onPhoneChange,
 }: {
   passports: PassportDetails[]
   travelerCount: number
+  /** 邀请页不给联系方式，传了才显示这一行 */
+  phone?: string
   onChange: (index: number, patch: Partial<PassportDetails>) => void
+  onPhoneChange?: (value: string) => void
 }) {
   const [active, setActive] = useState(0)
   const [mode, setMode] = useState<Mode>("intro")
@@ -334,6 +339,21 @@ export function PassportStep({
               其余信息可下单后补齐。
             </p>
           )}
+        </div>
+      )}
+
+      {onPhoneChange && (
+        <div className="mt-6 grid gap-1.5 border-t border-line/70 pt-4">
+          <span className="text-xs font-semibold text-ink-soft">手机号</span>
+          <input
+            type="tel"
+            inputMode="tel"
+            className={inputClass}
+            value={phone ?? ""}
+            onChange={(event) => onPhoneChange(event.target.value)}
+            placeholder="例如 13800138000"
+          />
+          <span className="text-[11px] text-ink-soft/70">用来联系您办签，必填。</span>
         </div>
       )}
     </StepCard>

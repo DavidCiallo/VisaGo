@@ -34,6 +34,8 @@ export interface VisaOrderEntity {
     invite_token: string;
     customer_email: string;
     customer_name: string;
+    /** 下单人手机号，用来联系 */
+    customer_phone: string;
     origin_code: string;
     country_code: string;
     travelers: number;
@@ -70,6 +72,7 @@ export class VisaOrderDTO {
     public invite_token: string;
     public customer_email: string;
     public customer_name: string;
+    public customer_phone: string;
     public origin_code: string;
     public origin_label: string;
     public country_code: string;
@@ -103,6 +106,7 @@ export class VisaOrderDTO {
         this.invite_token = origin.invite_token;
         this.customer_email = origin.customer_email;
         this.customer_name = origin.customer_name;
+        this.customer_phone = origin.customer_phone ?? "";
         this.origin_code = origin.origin_code;
         this.origin_label = VISA_ORIGIN_LABELS[origin.origin_code as VisaOriginCode] ?? origin.origin_code;
         this.country_code = origin.country_code;

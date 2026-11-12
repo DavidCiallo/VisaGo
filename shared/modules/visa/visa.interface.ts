@@ -10,6 +10,7 @@ import { PassportDetails, VisaOrderDTO, type VisaOrderEntity } from "./visa.enti
 export interface VisaCreateInput {
     customer_email: string;
     customer_name: string;
+    customer_phone: string;
     origin_code: string;
     country_code: string;
     travelers: number;
@@ -57,6 +58,7 @@ export function passportFilled(passport: PassportDetails | undefined): boolean {
 export class VisaCreateRequest {
     public customer_email: string;
     public customer_name: string;
+    public customer_phone: string;
     public origin_code: string;
     public country_code: string;
     public travelers: number;
@@ -75,6 +77,9 @@ export class VisaCreateRequest {
         if (!EMAIL_PATTERN.test(this.customer_email)) throw new Error("请先确认你的邮箱");
         this.customer_name = String(data.customer_name ?? "").trim();
         if (!this.customer_name) throw new Error("请先确认你的姓名");
+
+        this.customer_phone = String(data.customer_phone ?? "").replace(/[\s-]/g, "");
+        if (!/^\+?\d{6,15}$/.test(this.customer_phone)) throw new Error("请填写手机号");
 
         const originCode = String(data.origin_code ?? "") as VisaOriginCode;
         if (!VISA_ORIGIN_LABELS[originCode]) throw new Error("未知的出发地");

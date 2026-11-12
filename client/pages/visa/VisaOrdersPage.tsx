@@ -365,6 +365,7 @@ export function VisaOrdersPage() {
               <div className="grid grid-cols-2 gap-3">
                 <Field label="下单人" value={selected.customer_name} />
                 <Field label="邮箱" value={selected.customer_email} />
+                <Field label="手机号" value={selected.customer_phone} />
                 <Field label="出行人数" value={`${selected.travelers} 人`} />
                 <Field
                   label="附加服务"
