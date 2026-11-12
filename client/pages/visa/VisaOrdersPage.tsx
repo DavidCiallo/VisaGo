@@ -386,38 +386,24 @@ export function VisaOrdersPage() {
                   护照信息（{selected.passports.length} 位出行人）
                 </p>
                 <div className="space-y-2">
-                  {selected.passports.map((passport, index) => {
-                    const name = [passport.last_name, passport.first_name]
-                      .filter((part) => part && part.trim())
-                      .join(" ")
-                    const line1 = [name, passport.gender, passport.birth_date].filter(
-                      (part) => part && part.trim(),
-                    )
-                    const line2 = [
-                      passport.nationality,
-                      passport.birth_place,
-                      passport.passport_number && `护照 ${passport.passport_number}`,
-                    ].filter((part) => part && part.trim())
-                    const line3 = [
-                      passport.issue_date && `${passport.issue_date} 签发`,
-                      passport.expiry_date && `有效期至 ${passport.expiry_date}`,
-                    ].filter((part) => part && part.trim())
-
-                    return (
-                      <div key={index} className="rounded-md border px-3 py-2">
-                        <p className="text-sm font-medium">
-                          {selected.passports.length > 1 && (
-                            <span className="text-muted-foreground mr-1.5 text-xs">
-                              {index + 1}
-                            </span>
-                          )}
-                          {line1.join(" · ") || "—"}
-                        </p>
-                        <p className="text-muted-foreground text-xs">{line2.join(" · ")}</p>
-                        <p className="text-muted-foreground text-xs">{line3.join(" · ")}</p>
+                  {selected.passports.map((passport, index) => (
+                    <div key={index} className="space-y-2 rounded-md border p-3">
+                      <p className="text-muted-foreground text-xs font-semibold">
+                        出行人 {index + 1}
+                      </p>
+                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        <Field label="姓" value={passport.last_name} />
+                        <Field label="名" value={passport.first_name} />
+                        <Field label="出生日期" value={passport.birth_date} />
+                        <Field label="性别" value={passport.gender} />
+                        <Field label="国籍" value={passport.nationality} />
+                        <Field label="出生地" value={passport.birth_place} />
+                        <Field label="护照号" value={passport.passport_number} />
+                        <Field label="签发日期" value={passport.issue_date} />
+                        <Field label="有效期至" value={passport.expiry_date} />
                       </div>
-                    )
-                  })}
+                    </div>
+                  ))}
                 </div>
               </div>
 
