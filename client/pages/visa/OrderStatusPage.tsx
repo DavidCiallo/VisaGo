@@ -185,7 +185,9 @@ export function OrderStatusPage() {
       const res = await visaApi.passportScan({ token, index: uploadIndex, image, auth: orderKey })
       if (res.success && res.data?.order) {
         setOrder(res.data.order)
-        toast.success(res.data.recognized ? "已识别并更新护照信息" : "识别失败，请重新上传")
+        toast.success(
+          res.data.recognized ? "已识别并更新护照信息" : "照片已收到，没认出信息，请手动补充",
+        )
         return
       }
       toast.error(res.message || "上传失败，请重试")

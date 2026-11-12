@@ -72,6 +72,7 @@ export function PassportStep({
     onChange(active, patch)
     setScanned(true)
     setMode("form")
+    return Object.keys(patch).length
   }
 
   async function recognize(file: File) {
@@ -86,20 +87,20 @@ export function PassportStep({
       const res = await visaApi.ocrPassport({ image })
       const fields = res.data?.passport
       if (!res.success || !fields) {
-        toast.error("识别失败，请重新上传护照首页")
-        setMode("intro")
+        toast.error(res.message || "护照识别暂时不可用，请手动填写")
+        setMode("form")
         return
       }
-      // 没有姓名就没法建申请，必须重扫，不能拿别的数据顶上
-      if (!fields.last_name.trim() && !fields.first_name.trim()) {
-        toast.error("没有识别到姓名，请重新上传护照首页")
-        setMode("intro")
-        return
+
+      const count = applyFields(fields)
+      if (count === 0) {
+        toast("没认出护照信息，请手动填写", "info")
+      } else if (!fields.passport_number.trim() || !fields.birth_date.trim()) {
+        toast("已填入能认出的信息，其余请补充", "info")
       }
-      applyFields(fields)
     } catch {
-      toast.error("识别失败，请重新上传护照首页")
-      setMode("intro")
+      toast.error("护照照片没传成功，可以重试，也可以手动填写")
+      setMode("form")
     }
   }
 
