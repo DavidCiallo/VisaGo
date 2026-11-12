@@ -23,6 +23,7 @@ import {
     VisaOrderAttachInput,
     VisaOrderPositionInput,
     VisaOrderSetStatusInput,
+    VisaOrderArchiveInput,
     VisaPayCodeListInput,
     VisaPayCodeRemoveInput,
     VisaPayCodeReorderInput,
@@ -139,6 +140,27 @@ async function orderSetStatus(request: VisaOrderSetStatusInput) {
     const row = await VisaService.setStatus(String(request?.id ?? ""), String(request?.status ?? ""));
 
     return { order: await toDTO(row), pay_code: await VisaService.payCodeFor(row) };
+}
+
+async function archivedOrders(request: VisaOrdersInput) {
+    requireLogin(request);
+    const rows = await VisaService.listOrders(true);
+
+    return { orders: rows.map((row) => new VisaOrderDTO(row)) };
+}
+
+async function orderArchive(request: VisaOrderArchiveInput) {
+    requireLogin(request);
+    const row = await VisaService.archiveOrder(String(request?.id ?? ""));
+
+    return { order: await toDTO(row) };
+}
+
+async function orderRestore(request: VisaOrderArchiveInput) {
+    requireLogin(request);
+    const row = await VisaService.restoreOrder(String(request?.id ?? ""));
+
+    return { order: await toDTO(row) };
 }
 
 async function orderPosition(request: VisaOrderPositionInput) {
@@ -294,6 +316,9 @@ export const visaMount = {
         orderUpdate,
         orderStatus,
         orderSetStatus,
+        archivedOrders,
+        orderArchive,
+        orderRestore,
         orderPosition,
         orderAttach,
         payCodeList,

@@ -86,6 +86,8 @@ const UPLOAD_EXT: Record<string, string> = {
 
 /** 已锁定的订单半小时后自动进入预约中。 */
 const BOOKING_DELAY = 30 * 60 * 1000;
+/** 下单满三天才允许归档 */
+const ARCHIVE_AFTER_MS = 3 * 24 * 60 * 60 * 1000;
 
 function writeUpload(dataUrl: string) {
     const match = /^data:([^;]+);base64,([\s\S]+)$/.exec(String(dataUrl ?? "").trim());
@@ -144,12 +146,44 @@ export class VisaService {
         return await this.getSettings();
     }
 
-    static async listOrders(): Promise<VisaOrderEntity[]> {
+    static async listOrders(archived = false): Promise<VisaOrderEntity[]> {
         const rows = await visaOrderRepository.find({});
-        const sorted = rows.sort((a, b) => b.create_time - a.create_time);
+        const sorted = rows
+            .filter((row) => Boolean(row.archived_time) === archived)
+            .sort((a, b) => b.create_time - a.create_time);
         const advanced: VisaOrderEntity[] = [];
         for (const row of sorted) advanced.push(await this.advance(row));
         return advanced;
+    }
+
+    /** 待处理、已完成、已取消，且下单超过三天，才能归档 */
+    static canArchive(row: VisaOrderEntity) {
+        if (row.archived_time) return false;
+        if (!["new", "done", "cancelled"].includes(row.status)) return false;
+        return Date.now() - row.create_time > ARCHIVE_AFTER_MS;
+    }
+
+    static async archiveOrder(id: string) {
+        const row = await visaOrderRepository.findOne({ id });
+        if (!row) throw new Error("订单不存在");
+        if (!this.canArchive(row)) throw new Error("只有待处理、已完成、已取消且超过三天的订单可以归档");
+
+        await visaOrderRepository.update(
+            { id },
+            { archived_time: Date.now(), update_time: Date.now() },
+        );
+        return await this.getById(id);
+    }
+
+    static async restoreOrder(id: string) {
+        const row = await visaOrderRepository.findOne({ id });
+        if (!row) throw new Error("订单不存在");
+
+        await visaOrderRepository.update(
+            { id },
+            { archived_time: 0, update_time: Date.now() },
+        );
+        return await this.getById(id);
     }
 
     /** 已锁定满半小时的订单转成预约中，读的时候顺手落库。 */
@@ -582,7 +616,7 @@ export class VisaService {
 
     static async updateOrder(token: string, req: VisaOrderUpdateRequest, key: string) {
         const order = await this.authorize(token, key);
-        if (order.status === "locked") {
+        if (order.status === "locked" || order.status === "cancelled") {
             throw new Error("订单已锁定，如需修改请联系签证专员");
         }
 
@@ -618,7 +652,7 @@ export class VisaService {
     }
 
     static async setStatus(id: string, status: string) {
-        if (!["new", "locked", "booking", "queued"].includes(status)) {
+        if (!["new", "locked", "booking", "queued", "cancelled"].includes(status)) {
             throw new Error("未知的订单状态");
         }
         const order = await visaOrderRepository.findOne({ id });
@@ -644,7 +678,9 @@ export class VisaService {
     /** 只做识别并写回字段，图片本身不落盘。 */
     static async scanPassport(token: string, index: number, image: string, key: string) {
         const order = await this.authorize(token, key);
-        if (order.status === "locked") throw new Error("订单已锁定，如需修改请联系签证专员");
+        if (order.status === "locked" || order.status === "cancelled") {
+            throw new Error("订单已锁定，如需修改请联系签证专员");
+        }
         if (index < 0 || index >= order.passports.length) throw new Error("没有这位出行人");
 
         let recognized = false;
@@ -668,7 +704,9 @@ export class VisaService {
 
     static async addTraveler(token: string, key: string) {
         const order = await this.authorize(token, key);
-        if (order.status === "locked") throw new Error("订单已锁定，如需修改请联系签证专员");
+        if (order.status === "locked" || order.status === "cancelled") {
+            throw new Error("订单已锁定，如需修改请联系签证专员");
+        }
         if (order.travelers >= MAX_TRAVELERS) throw new Error(`最多 ${MAX_TRAVELERS} 位出行人`);
 
         const settings = await this.getSettings();
@@ -704,7 +742,9 @@ export class VisaService {
 
     static async removeTraveler(token: string, index: number, key: string) {
         const order = await this.authorize(token, key);
-        if (order.status === "locked") throw new Error("订单已锁定，如需修改请联系签证专员");
+        if (order.status === "locked" || order.status === "cancelled") {
+            throw new Error("订单已锁定，如需修改请联系签证专员");
+        }
         if (order.travelers <= 1) throw new Error("至少要保留一位出行人");
         if (!Number.isInteger(index) || index < 0 || index >= order.passports.length) {
             throw new Error("没有这位出行人");

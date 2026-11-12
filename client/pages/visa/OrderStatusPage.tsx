@@ -23,6 +23,7 @@ const STATUS_LABELS: Record<string, string> = {
   booking: "预约中",
   queued: "排号中",
   done: "已完成",
+  cancelled: "已取消",
 }
 
 interface OrderForm {

@@ -346,6 +346,12 @@ export interface VisaOrderSetStatusInput {    id: string;
     auth?: string;
 }
 
+/** 归档与恢复：只能归档待处理、已完成、已取消且超过三天的单子 */
+export interface VisaOrderArchiveInput {
+    id: string;
+    auth?: string;
+}
+
 export interface VisaOrderPositionInput {
     id: string;
     position: string;

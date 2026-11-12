@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react"
-import { RefreshCw, Search, Upload } from "lucide-react"
+import { Archive, RefreshCw, Search, Upload } from "lucide-react"
 
 import { Badge } from "@/client/components/ui/badge"
 import { Button } from "@/client/components/ui/button"
@@ -37,6 +37,16 @@ const STATUS_LABELS: Record<string, string> = {
   booking: "预约中",
   queued: "排号中",
   done: "已完成",
+  cancelled: "已取消",
+}
+
+/** 下单满三天才能归档，和服务端保持一致 */
+const ARCHIVE_AFTER_MS = 3 * 24 * 60 * 60 * 1000
+
+function canArchive(order: VisaOrderDTO) {
+  if (order.archived) return false
+  if (!["new", "done", "cancelled"].includes(order.status)) return false
+  return Date.now() - order.create_time > ARCHIVE_AFTER_MS
 }
 
 function pad(value: number) {
@@ -71,7 +81,39 @@ export function VisaOrdersPage() {
   const [selected, setSelected] = useState<VisaOrderDTO | null>(null)
   const [positionDraft, setPositionDraft] = useState("")
   const [attaching, setAttaching] = useState(false)
+  const [archived, setArchived] = useState<VisaOrderDTO[]>([])
+  const [archiveOpen, setArchiveOpen] = useState(false)
+  const [confirmCancel, setConfirmCancel] = useState(false)
   const letterInput = useRef<HTMLInputElement>(null)
+
+  async function loadArchived() {
+    const res = await visaApi.archivedOrders({ auth: getAuth() })
+    if (res.success) setArchived(res.data?.orders ?? [])
+  }
+
+  async function archiveOrder(order: VisaOrderDTO) {
+    const res = await visaApi.orderArchive({ id: order.id, auth: getAuth() })
+    if (!res.success) {
+      toast.error(res.message || "归档失败")
+      return
+    }
+    setSelected(null)
+    setOrders((rows) => rows.filter((row) => row.id !== order.id))
+    toast.success("已归档")
+    await loadArchived()
+  }
+
+  async function restoreOrder(order: VisaOrderDTO) {
+    const res = await visaApi.orderRestore({ id: order.id, auth: getAuth() })
+    if (!res.success) {
+      toast.error(res.message || "恢复失败")
+      return
+    }
+    setArchiveOpen(false)
+    toast.success("已恢复")
+    await load()
+    await loadArchived()
+  }
 
   async function load() {
     setLoading(true)
@@ -187,6 +229,17 @@ export function VisaOrdersPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setArchiveOpen(true)
+              void loadArchived()
+            }}
+          >
+            <Archive className="size-4" />
+            已归档 {archived.length || ""}
+          </Button>
           <Button variant="outline" onClick={load} disabled={loading}>
             <RefreshCw className={loading ? "size-4 animate-spin" : "size-4"} />
             刷新
@@ -302,7 +355,7 @@ export function VisaOrdersPage() {
       </Card>
 
       <Dialog open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
-        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle>订单 {selected?.id}</DialogTitle>
             <DialogDescription>
@@ -437,6 +490,17 @@ export function VisaOrdersPage() {
                       退回待处理
                     </Button>
                   )}
+                  {selected.status !== "cancelled" && (
+                    <Button size="sm" variant="outline" onClick={() => setConfirmCancel(true)}>
+                      取消订单
+                    </Button>
+                  )}
+                  {canArchive(selected) && (
+                    <Button size="sm" variant="outline" onClick={() => archiveOrder(selected)}>
+                      <Archive className="mr-1.5 size-3.5" />
+                      归档
+                    </Button>
+                  )}
                 </div>
               </div>
 
@@ -490,6 +554,64 @@ export function VisaOrdersPage() {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={confirmCancel} onOpenChange={setConfirmCancel}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>取消这个订单？</DialogTitle>
+            <DialogDescription>
+              取消后客户看到「已取消」，不能再改单。要撤销就点订单里的「退回待处理」。
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-wrap justify-end gap-2">
+            <Button variant="outline" onClick={() => setConfirmCancel(false)}>
+              再想想
+            </Button>
+            <Button
+              onClick={() => {
+                setConfirmCancel(false)
+                void setStatus("cancelled")
+              }}
+            >
+              取消订单
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={archiveOpen} onOpenChange={setArchiveOpen}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>已归档的订单</DialogTitle>
+            <DialogDescription>恢复后会回到订单列表。</DialogDescription>
+          </DialogHeader>
+          {archived.length === 0 ? (
+            <p className="text-muted-foreground text-sm">还没有归档的订单。</p>
+          ) : (
+            <div className="space-y-2">
+              {archived.map((order) => (
+                <div
+                  key={order.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-md border p-3"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium">
+                      {order.id} · {order.country_name} {order.visa}
+                    </p>
+                    <p className="text-muted-foreground text-xs">
+                      {order.customer_name} · {formatTime(order.create_time)} ·{" "}
+                      {STATUS_LABELS[order.status] ?? order.status}
+                    </p>
+                  </div>
+                  <Button size="sm" variant="outline" onClick={() => restoreOrder(order)}>
+                    恢复
+                  </Button>
+                </div>
+              ))}
             </div>
           )}
         </DialogContent>

@@ -55,6 +55,8 @@ export interface VisaOrderEntity {
     locked_time?: number;
     /** 后台填的预约到的位置 */
     position?: string;
+    /** 归档时间，0 或缺省表示没归档 */
+    archived_time?: number;
     files?: VisaOrderFile[];
     /** 只发给下单本人的查看密钥，不进 URL */
     view_key: string;
@@ -91,6 +93,7 @@ export class VisaOrderDTO {
     public status: string;
     public locked_time: number;
     public position: string;
+    public archived: boolean;
     public files: VisaOrderFile[];
 
     constructor(origin: VisaOrderEntity) {
@@ -123,6 +126,7 @@ export class VisaOrderDTO {
         this.status = origin.status;
         this.locked_time = origin.locked_time ?? 0;
         this.position = origin.position ?? "";
+        this.archived = Boolean(origin.archived_time);
         this.files = origin.files ?? [];
     }
 }

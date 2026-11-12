@@ -18,6 +18,7 @@ import {
     VisaOrderAttachInput,
     VisaOrderPositionInput,
     VisaOrderSetStatusInput,
+    VisaOrderArchiveInput,
     VisaCalendarScanInput,
     VisaCalendarScanResponse,
     VisaPayCodeListInput,
@@ -166,6 +167,21 @@ export const visaRoutes = {
         path: "/order-set-status",
         request: {} as VisaOrderSetStatusInput,
         response: {} as VisaOrderResponse,
+    },
+    orderArchive: {
+        path: "/order-archive",
+        request: {} as VisaOrderArchiveInput,
+        response: {} as VisaOrderResponse,
+    },
+    orderRestore: {
+        path: "/order-restore",
+        request: {} as VisaOrderArchiveInput,
+        response: {} as VisaOrderResponse,
+    },
+    archivedOrders: {
+        path: "/archived-orders",
+        request: {} as VisaOrdersInput,
+        response: {} as VisaOrdersResponse,
     },
     orderPosition: {
         path: "/order-position",
