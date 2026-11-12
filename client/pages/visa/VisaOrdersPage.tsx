@@ -40,13 +40,9 @@ const STATUS_LABELS: Record<string, string> = {
   cancelled: "已取消",
 }
 
-/** 下单满三天才能归档，和服务端保持一致 */
-const ARCHIVE_AFTER_MS = 3 * 24 * 60 * 60 * 1000
-
+/** 只有已取消的订单能归档，和服务端保持一致 */
 function canArchive(order: VisaOrderDTO) {
-  if (order.archived) return false
-  if (!["new", "done", "cancelled"].includes(order.status)) return false
-  return Date.now() - order.create_time > ARCHIVE_AFTER_MS
+  return !order.archived && order.status === "cancelled"
 }
 
 function pad(value: number) {

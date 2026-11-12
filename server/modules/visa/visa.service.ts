@@ -86,8 +86,6 @@ const UPLOAD_EXT: Record<string, string> = {
 
 /** 已锁定的订单半小时后自动进入预约中。 */
 const BOOKING_DELAY = 30 * 60 * 1000;
-/** 下单满三天才允许归档 */
-const ARCHIVE_AFTER_MS = 3 * 24 * 60 * 60 * 1000;
 
 function writeUpload(dataUrl: string) {
     const match = /^data:([^;]+);base64,([\s\S]+)$/.exec(String(dataUrl ?? "").trim());
@@ -156,17 +154,16 @@ export class VisaService {
         return advanced;
     }
 
-    /** 待处理、已完成、已取消，且下单超过三天，才能归档 */
+    /** 只有取消掉的单子可以归档 */
     static canArchive(row: VisaOrderEntity) {
         if (row.archived_time) return false;
-        if (!["new", "done", "cancelled"].includes(row.status)) return false;
-        return Date.now() - row.create_time > ARCHIVE_AFTER_MS;
+        return row.status === "cancelled";
     }
 
     static async archiveOrder(id: string) {
         const row = await visaOrderRepository.findOne({ id });
         if (!row) throw new Error("订单不存在");
-        if (!this.canArchive(row)) throw new Error("只有待处理、已完成、已取消且超过三天的订单可以归档");
+        if (!this.canArchive(row)) throw new Error("只有已取消的订单可以归档");
 
         await visaOrderRepository.update(
             { id },
