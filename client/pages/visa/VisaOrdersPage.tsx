@@ -392,8 +392,12 @@ export function VisaOrdersPage() {
                         出行人 {index + 1}
                       </p>
                       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                        <Field label="姓" value={passport.last_name} />
-                        <Field label="名" value={passport.first_name} />
+                        <Field
+                          label="名/姓"
+                          value={[passport.first_name, passport.last_name]
+                            .filter((part) => part && part.trim())
+                            .join(" ")}
+                        />
                         <Field label="出生日期" value={passport.birth_date} />
                         <Field label="性别" value={passport.gender} />
                         <Field label="国籍" value={passport.nationality} />
