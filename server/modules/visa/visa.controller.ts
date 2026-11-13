@@ -36,6 +36,7 @@ import { visaRoutes } from "../../../shared/modules/visa/visa.router";
 import { getIdentifyByVerify } from "../auth/auth.service";
 import { VisaService } from "./visa.service";
 import { ocrConfigured, recognizePassport } from "./visa.ocr";
+import { gbpToCny } from "./visa.fx";
 
 /** 后台接口：请求里必须带有效的登录 token。 */
 function requireLogin(request: any) {
@@ -51,6 +52,10 @@ async function saveSettings(request: VisaSaveSettingsInput) {
     const req = VisaSaveSettingsRequest.self(request);
 
     return { settings: await VisaService.saveSettings(req.settings) };
+}
+
+async function fx() {
+    return { fx: await gbpToCny() };
 }
 
 async function toDTO(row: VisaOrderEntity) {
@@ -307,6 +312,7 @@ export const visaMount = {
     handlers: {
         settings,
         saveSettings,
+        fx,
         create,
         orders,
         invite,

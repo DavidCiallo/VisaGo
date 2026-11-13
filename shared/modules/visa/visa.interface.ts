@@ -250,6 +250,13 @@ export interface VisaOrderResponse {
 }
 
 /** 后台维护的收款码：一个金额对应一张码。 */
+export interface VisaFxResponse {
+    success: boolean;
+    /** 查不到就是 null，前端显示兜底汇率 */
+    data?: { fx: { rate: number; date: string; source: string } | null };
+    message?: string;
+}
+
 export interface VisaPayCode {
     id: string;
     amount: number;

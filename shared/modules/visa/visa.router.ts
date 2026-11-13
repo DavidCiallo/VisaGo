@@ -43,6 +43,7 @@ import {
     VisaRemoveTravelerInput,
     VisaSaveSettingsInput,
     VisaSettingsResponse,
+    VisaFxResponse,
 } from "./visa.interface";
 
 export const visaRoutes = {
@@ -57,6 +58,11 @@ export const visaRoutes = {
         path: "/save-settings",
         request: {} as VisaSaveSettingsInput,
         response: {} as VisaSettingsResponse,
+    },
+    fx: {
+        path: "/fx",
+        request: {} as Record<string, never>,
+        response: {} as VisaFxResponse,
     },
     create: {
         path: "/create",

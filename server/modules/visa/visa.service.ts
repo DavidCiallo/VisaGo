@@ -33,6 +33,7 @@ import {
     VisaOrderUpdateRequest,
 } from "../../../shared/modules/visa/visa.interface";
 import { ocrConfigured, recognizePassport, recognizeWords } from "./visa.ocr";
+import { gbpToCny } from "./visa.fx";
 
 interface VisaSettingsRow {
     id: string;
@@ -700,10 +701,13 @@ export class VisaService {
 
         const settings = await this.getSettings();
         const currency = currencyOf(order.origin_code).code;
-        const rate = fxRate(settings);
-        // 只收人民币，英国订单按后台填的汇率折过来找码
-        if (currency === "GBP" && rate > 0) {
-            return await this.findPayCode(Math.round(order.total * rate), "CNY");
+        // 只收人民币，英国订单按当天汇率折过来找码；查不到汇率就用后台填的兜底
+        if (currency === "GBP") {
+            const live = await gbpToCny();
+            const rate = live?.rate ?? fxRate(settings);
+            if (rate > 0) {
+                return await this.findPayCode(Math.round(order.total * rate), "CNY");
+            }
         }
         return await this.findPayCode(order.total, currency);
     }

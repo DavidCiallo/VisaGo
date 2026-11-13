@@ -80,6 +80,7 @@ export function VisaSettingsPage() {
   const [activeCenters, setActiveCenters] = useState<Record<string, number>>({})
   const [activeCountry, setActiveCountry] = useState(VISA_COUNTRIES[0]?.code ?? "")
   const [loading, setLoading] = useState(true)
+  const [fx, setFx] = useState<{ rate: number; date: string; source: string } | null>(null)
   const [loadFailed, setLoadFailed] = useState(false)
   const [saving, setSaving] = useState(false)
   const [scanning, setScanning] = useState(false)
@@ -118,8 +119,14 @@ export function VisaSettingsPage() {
     }
   }
 
+  async function loadFx() {
+    const res = await visaApi.fx({})
+    if (res.success) setFx(res.data?.fx ?? null)
+  }
+
   useEffect(() => {
     load()
+    void loadFx()
   }, [])
 
   function updateDestination(
@@ -467,9 +474,19 @@ export function VisaSettingsPage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-base">汇率</CardTitle>
           </CardHeader>
-          <CardContent>
-            <label className="flex flex-wrap items-center gap-3">
+          <CardContent className="grid gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <span className="text-muted-foreground text-xs">1 英镑 =</span>
+              <span className="text-sm font-semibold">{fx ? fx.rate.toFixed(4) : "—"} 人民币</span>
+              <Button size="sm" variant="outline" className="h-7" onClick={() => void loadFx()}>
+                刷新
+              </Button>
+              <span className="text-muted-foreground text-xs">
+                {fx ? `${fx.date} · ${fx.source}，每 6 小时自动更新` : "暂时查不到，用下面的兜底汇率"}
+              </span>
+            </div>
+            <label className="flex flex-wrap items-center gap-3">
+              <span className="text-muted-foreground text-xs">兜底汇率</span>
               <Input
                 type="number"
                 min={0}
@@ -480,7 +497,7 @@ export function VisaSettingsPage() {
                 onChange={(event) => updateFx(Number(event.target.value) || 0)}
               />
               <span className="text-muted-foreground text-xs">
-                人民币。英国订单按这个折成人民币找收款码；填 0 就不折
+                自动查不到时用它；填 0 就不折
               </span>
             </label>
           </CardContent>
