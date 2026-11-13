@@ -414,69 +414,57 @@ export function VisaSettingsPage() {
 
       {settings && (
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">材料组排期</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex flex-wrap items-end gap-4">
-              <label className="grid gap-1.5">
-                <span className="text-muted-foreground text-xs">积压时长（工作日）</span>
+          <CardContent className="divide-y">
+            <div className="grid gap-2 pb-4">
+              <p className="text-sm font-semibold">材料组排期</p>
+              <div className="flex flex-wrap items-end gap-4">
+                <label className="grid gap-1.5">
+                  <span className="text-muted-foreground text-xs">积压时长（工作日）</span>
+                  <Input
+                    type="number"
+                    min={0}
+                    className="h-8 w-24"
+                    value={settings.materials.workdays}
+                    onFocus={(event) => event.target.select()}
+                    onChange={(event) =>
+                      updateMaterials({ workdays: Math.max(0, Number(event.target.value) || 0) })
+                    }
+                  />
+                </label>
+                <p className="text-muted-foreground pb-1.5 text-xs">
+                  最早可递签 {plan.firstDate}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-2 py-4">
+              <p className="text-sm font-semibold">汇兑磨损</p>
+              <label className="flex flex-wrap items-center gap-3">
+                <span className="text-muted-foreground text-xs">每人</span>
                 <Input
                   type="number"
                   min={0}
+                  step={1}
                   className="h-8 w-24"
-                  value={settings.materials.workdays}
+                  value={origin?.fee ?? 0}
                   onFocus={(event) => event.target.select()}
-                  onChange={(event) =>
-                    updateMaterials({ workdays: Math.max(0, Number(event.target.value) || 0) })
-                  }
+                  onChange={(event) => updateFee(Number(event.target.value) || 0)}
                 />
+                <span className="text-muted-foreground text-xs">
+                  {currencyOf(originCode).symbol}
+                </span>
               </label>
-              <p className="text-muted-foreground pb-1.5 text-xs">
-                最早可递签 {plan.firstDate}
-              </p>
             </div>
-          </CardContent>
-        </Card>
-      )}
 
-      {settings && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">汇兑磨损</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <label className="flex flex-wrap items-center gap-3">
-              <span className="text-muted-foreground text-xs">每人</span>
-              <Input
-                type="number"
-                min={0}
-                step={1}
-                className="h-8 w-24"
-                value={origin?.fee ?? 0}
-                onFocus={(event) => event.target.select()}
-                onChange={(event) => updateFee(Number(event.target.value) || 0)}
-              />
-              <span className="text-muted-foreground text-xs">
-                {currencyOf(originCode).symbol}
-              </span>
-            </label>
-          </CardContent>
-        </Card>
-      )}
-
-      {settings && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">汇率</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="text-muted-foreground text-xs">1 英镑 =</span>
-              <span className="text-sm font-semibold">{fx ? fx.rate.toFixed(4) : "—"} 人民币</span>
-              <Button size="sm" variant="outline" className="h-7" onClick={() => void loadFx()}>
-                刷新
-              </Button>
+            <div className="grid gap-2 pt-4">
+              <p className="text-sm font-semibold">汇率</p>
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="text-muted-foreground text-xs">1 英镑 =</span>
+                <span className="text-sm font-semibold">{fx ? fx.rate.toFixed(4) : "—"} 人民币</span>
+                <Button size="sm" variant="outline" className="h-7" onClick={() => void loadFx()}>
+                  刷新
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
