@@ -21,6 +21,7 @@ import {
   TableRow,
 } from "@/client/components/ui/table"
 import { visaApi } from "@/client/api/instance"
+import { cn } from "@/client/lib/utils"
 import { getAuth } from "@/client/methods/auth"
 import { toast } from "@/client/methods/notify"
 import { VISA_COUNTRIES, VISA_SLOT_SUPPORT_LABELS } from "@/shared/modules/visa/visa.catalog"
@@ -60,10 +61,24 @@ function formatDay(iso: string) {
 }
 
 function Field({ label, value }: { label: string; value: string | number }) {
+  const text = value === "" || value === undefined || value === null ? "" : String(value)
+
+  async function copy() {
+    if (!text) return
+    await navigator.clipboard.writeText(text)
+    toast.success("已复制")
+  }
+
   return (
     <div className="grid gap-0.5">
       <span className="text-muted-foreground text-xs">{label}</span>
-      <span className="text-sm break-words">{value === "" || value === undefined ? "—" : value}</span>
+      <span
+        onClick={copy}
+        title={text ? "点击复制" : undefined}
+        className={cn("text-sm break-words", text && "cursor-pointer hover:text-brand")}
+      >
+        {text || "—"}
+      </span>
     </div>
   )
 }
@@ -415,16 +430,10 @@ export function VisaOrdersPage() {
                 <p className="text-muted-foreground mb-2 text-xs font-semibold">递签</p>
                 <div className="grid gap-3">
                   <Field label="签证中心" value={selected.appointment_city} />
-                  <div className="grid gap-0.5">
-                    <span className="text-muted-foreground text-xs">候选日期</span>
-                    <span className="flex flex-wrap gap-1">
-                      {selected.appointment_dates.map((iso) => (
-                        <span key={iso} className="rounded bg-muted px-1.5 py-0.5 text-xs">
-                          {formatDay(iso)}
-                        </span>
-                      ))}
-                    </span>
-                  </div>
+                  <Field
+                    label="候选日期"
+                    value={selected.appointment_dates.map((iso) => formatDay(iso)).join("、")}
+                  />
                   <Field label="备注" value={selected.appointment_note} />
                 </div>
               </div>
