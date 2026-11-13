@@ -9,7 +9,14 @@ export interface FxRate {
 
 const TTL = 6 * 60 * 60 * 1000;
 
+/** 公开接口给的是中间价，支付宝按银行价收，这里补 0.5% 的差价。 */
+const MARKUP = 0.005;
+
 let cache: { value: FxRate; at: number } | null = null;
+
+function withMarkup(rate: number) {
+    return Math.round(rate * (1 + MARKUP) * 10000) / 10000;
+}
 
 async function frankfurter(): Promise<FxRate> {
     const res = await fetch("https://api.frankfurter.app/latest?from=GBP&to=CNY", {
@@ -17,7 +24,7 @@ async function frankfurter(): Promise<FxRate> {
     });
     const data: any = await res.json();
     return {
-        rate: Number(data?.rates?.CNY),
+        rate: withMarkup(Number(data?.rates?.CNY)),
         date: String(data?.date ?? ""),
         source: "frankfurter",
     };
@@ -29,7 +36,7 @@ async function openErApi(): Promise<FxRate> {
     });
     const data: any = await res.json();
     return {
-        rate: Number(data?.rates?.CNY),
+        rate: withMarkup(Number(data?.rates?.CNY)),
         date: String(data?.time_last_update_utc ?? ""),
         source: "exchangerate-api",
     };

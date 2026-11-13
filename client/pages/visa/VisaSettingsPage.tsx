@@ -483,7 +483,7 @@ export function VisaSettingsPage() {
               </Button>
               <span className="text-muted-foreground text-xs">
                 {fx
-                  ? `${fx.date} · ${fx.source}，每 6 小时自动更新；这是中间价，支付宝按银行价会略高`
+                  ? `${fx.date} · ${fx.source}，中间价加 0.5%，每 6 小时自动更新`
                   : "暂时查不到，用下面的手填汇率"}
               </span>
             </div>
