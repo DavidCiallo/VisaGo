@@ -1020,9 +1020,15 @@ function BookingSuccess({ order, payCode }: { order: VisaOrderDTO; payCode: Visa
               className="mx-auto mt-4 w-44 rounded-2xl bg-white object-contain"
             />
             <p className="mt-3 text-2xl font-extrabold text-brand">
-              {currencyOf(order.origin_code).symbol}
-              {payCode.amount}
+              {currencyOf(payCode.currency).symbol}
+              {payCode.pay_amount}
             </p>
+            {payCode.currency !== currencyOf(order.origin_code).code && (
+              <p className="mt-1 text-[11px] text-ink-soft">
+                {currencyOf(order.origin_code).symbol}
+                {order.total} 按汇率折算成人民币
+              </p>
+            )}
             <button
               type="button"
               onClick={() => setPayOpen(false)}

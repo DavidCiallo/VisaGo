@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react"
 import jsQR from "jsqr"
-import { Trash2, Upload } from "lucide-react"
+import { Star, Trash2, Upload } from "lucide-react"
 
 import { Button } from "@/client/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/client/components/ui/card"
@@ -99,11 +99,29 @@ export function VisaPayCodePage() {
   const [amount, setAmount] = useState("")
   const [currency, setCurrency] = useState("CNY")
   const [label, setLabel] = useState("")
+  const [fallback, setFallback] = useState(false)
   const [image, setImage] = useState("")
   const [saving, setSaving] = useState(false)
   const [scanning, setScanning] = useState(false)
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  async function toggleFallback(code: VisaPayCode) {
+    const res = await visaApi.payCodeSave({
+      id: code.id,
+      amount: code.amount,
+      currency: code.currency,
+      label: code.label,
+      fallback: !code.fallback,
+      auth: getAuth(),
+    })
+    if (!res.success) {
+      toast.error(res.message || "设置失败")
+      return
+    }
+    toast.success(code.fallback ? "已取消兜底" : "已设为兜底")
+    await load()
+  }
 
   async function load() {
     const res = await visaApi.payCodeList({ auth: getAuth() })
@@ -214,6 +232,7 @@ export function VisaPayCodePage() {
       amount: value,
       currency,
       label: label.trim(),
+      fallback,
       image,
       auth: getAuth(),
     })
@@ -315,6 +334,15 @@ export function VisaPayCodePage() {
                 placeholder="例如：微信收款"
               />
             </label>
+            <label className="flex items-center gap-2 text-xs">
+              <input
+                type="checkbox"
+                checked={fallback}
+                onChange={(event) => setFallback(event.target.checked)}
+                className="size-3.5"
+              />
+              设为兜底码（没有金额匹配时用它）
+            </label>
             <div>
               <Button onClick={save} disabled={saving}>
                 {saving ? "保存中…" : "保存收款码"}
@@ -355,24 +383,37 @@ export function VisaPayCodePage() {
                     draggable={false}
                     className="aspect-square w-full rounded bg-white object-contain"
                   />
-                  <div className="mt-1 flex items-center justify-between gap-1">
-                    <div className="min-w-0">
-                      <p className="text-xs font-medium">
-                        {code.currency === "GBP" ? "£" : "¥"}
-                        {code.amount}
-                      </p>
-                      {code.label && (
-                        <p className="text-muted-foreground truncate text-[10px]">{code.label}</p>
-                      )}
-                    </div>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="size-6 shrink-0"
-                      onClick={() => remove(code.id)}
+                  <div className="mt-1 space-y-0.5">
+                    <p
+                      className={cn("text-xs font-medium", code.fallback && "text-brand")}
+                      title={code.fallback ? "兜底码：没有金额匹配时用它" : undefined}
                     >
-                      <Trash2 className="size-3" />
-                    </Button>
+                      {code.fallback ? "★" : ""}
+                      {code.currency === "GBP" ? "£" : "¥"}
+                      {code.amount}
+                    </p>
+                    {code.label && (
+                      <p className="text-muted-foreground truncate text-[10px]">{code.label}</p>
+                    )}
+                    <div className="flex items-center justify-between">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className={cn("size-6", code.fallback && "text-brand")}
+                        onClick={() => toggleFallback(code)}
+                        title={code.fallback ? "取消兜底" : "设为兜底"}
+                      >
+                        <Star className="size-3" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="size-6"
+                        onClick={() => remove(code.id)}
+                      >
+                        <Trash2 className="size-3" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}

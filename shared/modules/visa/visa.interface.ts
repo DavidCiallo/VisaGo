@@ -256,6 +256,10 @@ export interface VisaPayCode {
     currency: string;
     label: string;
     url: string;
+    /** 没有金额匹配时用这张 */
+    fallback: boolean;
+    /** 客户实际要付多少，币种同 currency；英国订单折成人民币 */
+    pay_amount: number;
 }
 
 export interface VisaPayCodeListInput {
@@ -273,6 +277,8 @@ export interface VisaPayCodeSaveInput {
     amount: number;
     currency: string;
     label?: string;
+    /** 设为兜底码：没有金额匹配时用这张 */
+    fallback?: boolean;
     /** data:image/png;base64,... 只在新增或换图时带 */
     image?: string;
     auth?: string;

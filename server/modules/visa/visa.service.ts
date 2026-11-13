@@ -14,6 +14,7 @@ import {
     currencyOf,
     feeOf,
     findDestination,
+    fxRate,
     findOrigin,
     materialsPlan,
     normalizeSettings,
@@ -39,6 +40,8 @@ interface VisaSettingsRow {
     update_time: number | null;
     delete_time: number | null;
     materials: VisaMaterials;
+    /** 1 英镑折多少人民币 */
+    fx_gbp_cny?: number;
     origins: VisaOrigin[];
 }
 
@@ -64,8 +67,10 @@ interface VisaPayCodeEntity {
     currency: string;
     label: string;
     image_id: string;
-    /** 后台拖动排的顺序 */
+    /** 拖动排的顺序 */
     sort?: number;
+    /** 没有金额匹配时用这张 */
+    fallback?: boolean;
 }
 
 const visaPayCodeRepository: Repository<VisaPayCodeEntity> = Repository.instance("VisaPayCode");
@@ -130,16 +135,15 @@ export class VisaService {
 
     static async saveSettings(settings: VisaSettings): Promise<VisaSettings> {
         const row = await visaSettingsRepository.findOne({});
+        const fields = {
+            materials: settings.materials,
+            fx_gbp_cny: settings.fx_gbp_cny ?? 0,
+            origins: settings.origins,
+        };
         if (row) {
-            await visaSettingsRepository.update(
-                { id: row.id },
-                { materials: settings.materials, origins: settings.origins },
-            );
+            await visaSettingsRepository.update({ id: row.id }, fields);
         } else {
-            await visaSettingsRepository.insert({
-                materials: settings.materials,
-                origins: settings.origins,
-            });
+            await visaSettingsRepository.insert(fields);
         }
         return await this.getSettings();
     }
@@ -221,23 +225,30 @@ export class VisaService {
         return await this.listPayCodes();
     }
 
-    static payCodeView(row: VisaPayCodeEntity) {
+    static payCodeView(row: VisaPayCodeEntity, payAmount = row.amount) {
         return {
             id: row.id,
             amount: row.amount,
             currency: row.currency,
             label: row.label,
             url: `/api/visa/file?id=${row.image_id}`,
+            fallback: Boolean(row.fallback),
+            pay_amount: payAmount,
         };
     }
 
-    /** 一个金额配一张码，找不到就不收款。 */
+    /** 先按金额找，找不到就用这个币种的兜底码。 */
     static async findPayCode(amount: number, currency: string) {
         const rows = await visaPayCodeRepository.find({ currency });
-        const hit = rows
+        const exact = rows
             .filter((row) => Math.round(row.amount) === Math.round(amount))
             .sort((a, b) => b.create_time - a.create_time)[0];
-        return hit ? this.payCodeView(hit) : null;
+        if (exact) return this.payCodeView(exact, amount);
+
+        const fallback = rows
+            .filter((row) => row.fallback)
+            .sort((a, b) => b.create_time - a.create_time)[0];
+        return fallback ? this.payCodeView(fallback, amount) : null;
     }
 
     static async savePayCode(req: any) {
@@ -252,18 +263,34 @@ export class VisaService {
         if (!imageId) throw new Error("请上传收款码图片");
 
         const label = String(req?.label ?? "").trim().slice(0, 40);
+        const fallback = Boolean(req?.fallback);
+        // 一个币种只留一张兜底码
+        if (fallback) {
+            const others = await visaPayCodeRepository.find({ currency });
+            for (const row of others) {
+                if (row.fallback && row.id !== existing?.id) {
+                    await visaPayCodeRepository.update({ id: row.id }, { fallback: false });
+                }
+            }
+        }
 
         if (existing) {
             await visaPayCodeRepository.update(
                 { id: existing.id },
-                { amount, currency, label, image_id: imageId, update_time: Date.now() },
+                { amount, currency, label, image_id: imageId, fallback, update_time: Date.now() },
             );
         } else {
             const clash = await visaPayCodeRepository.find({ currency });
             if (clash.some((row) => Math.round(row.amount) === amount)) {
                 throw new Error("这个金额已经有一张收款码了");
             }
-            await visaPayCodeRepository.insert({ amount, currency, label, image_id: imageId });
+            await visaPayCodeRepository.insert({
+                amount,
+                currency,
+                label,
+                image_id: imageId,
+                fallback,
+            });
         }
 
         const rows = await visaPayCodeRepository.find({ currency });
@@ -670,7 +697,15 @@ export class VisaService {
     /** 状态走到待处理时，订单页显示对应金额的收款码。 */
     static async payCodeFor(order: VisaOrderEntity) {
         if (order.status !== "new") return null;
-        return await this.findPayCode(order.total, currencyOf(order.origin_code).code);
+
+        const settings = await this.getSettings();
+        const currency = currencyOf(order.origin_code).code;
+        const rate = fxRate(settings);
+        // 只收人民币，英国订单按后台填的汇率折过来找码
+        if (currency === "GBP" && rate > 0) {
+            return await this.findPayCode(Math.round(order.total * rate), "CNY");
+        }
+        return await this.findPayCode(order.total, currency);
     }
 
     /** 只做识别并写回字段，图片本身不落盘。 */

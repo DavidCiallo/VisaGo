@@ -156,6 +156,10 @@ export function VisaSettingsPage() {
     })
   }
 
+  function updateFx(value: number) {
+    setSettings((current) => (current ? { ...current, fx_gbp_cny: Math.max(0, value) } : current))
+  }
+
   function updateCenter(countryCode: string, index: number, patch: Partial<VisaCenter>) {
     updateDestination(countryCode, (destination) => ({
       ...destination,
@@ -452,6 +456,31 @@ export function VisaSettingsPage() {
               />
               <span className="text-muted-foreground text-xs">
                 {currencyOf(originCode).symbol}，跟签证费一起收，为代付产生的汇兑与通道损耗
+              </span>
+            </label>
+          </CardContent>
+        </Card>
+      )}
+
+      {settings && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">汇率</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <label className="flex flex-wrap items-center gap-3">
+              <span className="text-muted-foreground text-xs">1 英镑 =</span>
+              <Input
+                type="number"
+                min={0}
+                step={0.01}
+                className="h-8 w-24"
+                value={settings.fx_gbp_cny ?? 0}
+                onFocus={(event) => event.target.select()}
+                onChange={(event) => updateFx(Number(event.target.value) || 0)}
+              />
+              <span className="text-muted-foreground text-xs">
+                人民币。英国订单按这个折成人民币找收款码；填 0 就不折
               </span>
             </label>
           </CardContent>

@@ -48,7 +48,12 @@ export function OrderStatusPage() {
   )
 
   const [order, setOrder] = useState<VisaOrderDTO | null>(null)
-  const [payCode, setPayCode] = useState<{ url: string; label: string } | null>(null)
+  const [payCode, setPayCode] = useState<{
+    url: string
+    label: string
+    currency: string
+    pay_amount: number
+  } | null>(null)
   // 刚下单那次展开收款码，之后再进默认收起
   const [payOpen, setPayOpen] = useState(false)
   const [error, setError] = useState("")
@@ -453,9 +458,17 @@ export function OrderStatusPage() {
               <div>
                 <p className="text-sm font-bold text-ink">扫码付款</p>
                 <p className="mt-1 text-xs text-ink-soft">
-                  应付 {symbol}
-                  {order.total}
+                  应付{" "}
+                  {payCode
+                    ? `${currencyOf(payCode.currency).symbol}${payCode.pay_amount}`
+                    : `${symbol}${order.total}`}
                 </p>
+                {payCode && payCode.currency !== currencyOf(order.origin_code).code && (
+                  <p className="mt-0.5 text-[11px] text-ink-soft">
+                    {symbol}
+                    {order.total} 按汇率折算成人民币
+                  </p>
+                )}
               </div>
               {payCode && (
                 <button
