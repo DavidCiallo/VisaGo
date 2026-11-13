@@ -18,8 +18,14 @@ export const VISA_ORIGIN_CURRENCY: Record<VisaOriginCode, VisaCurrency> = {
     UK: { code: "GBP", symbol: "£" },
 };
 
-/** 老订单没有出发地，按人民币报价显示 */
-export const DEFAULT_CURRENCY: VisaCurrency = { code: "CNY", symbol: "¥" };
+export const DEFAULT_CURRENCY: VisaCurrency = { code: "USD", symbol: "$" };
+
+const CURRENCY_SYMBOLS: Record<string, string> = { CNY: "¥", GBP: "£" };
+
+/** 币种代码直接取符号；currencyOf 是按出发地代码查的，别混用 */
+export function symbolOf(currency: string): string {
+    return CURRENCY_SYMBOLS[currency] ?? DEFAULT_CURRENCY.symbol;
+}
 
 export function currencyOf(originCode: string): VisaCurrency {
     return VISA_ORIGIN_CURRENCY[originCode as VisaOriginCode] ?? DEFAULT_CURRENCY;

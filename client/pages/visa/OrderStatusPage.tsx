@@ -15,7 +15,7 @@ import {
   normalizeSlotSupport,
   type VisaSlotSupport,
 } from "@/shared/modules/visa/visa.catalog"
-import { currencyOf } from "@/shared/modules/visa/visa.settings"
+import { currencyOf, symbolOf } from "@/shared/modules/visa/visa.settings"
 
 const STATUS_LABELS: Record<string, string> = {
   new: "待处理",
@@ -460,7 +460,7 @@ export function OrderStatusPage() {
                 <p className="mt-1 text-xs text-ink-soft">
                   应付{" "}
                   {payCode
-                    ? `${currencyOf(payCode.currency).symbol}${payCode.pay_amount}`
+                    ? `${symbolOf(payCode.currency)}${payCode.pay_amount}`
                     : `${symbol}${order.total}`}
                 </p>
                 {payCode && payCode.currency !== currencyOf(order.origin_code).code && (
@@ -491,7 +491,7 @@ export function OrderStatusPage() {
                   <div className="mt-3 flex flex-col items-center">
                     <img
                       src={payCode.url}
-                      alt="微信支付二维码"
+                      alt="收款二维码"
                       className="size-52 rounded-2xl bg-white p-2 ring-1 ring-line"
                     />
                     {payCode.label && (

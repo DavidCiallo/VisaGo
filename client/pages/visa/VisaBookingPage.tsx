@@ -11,6 +11,7 @@ import { findCountry, normalizeSlotSupport, quoteVisa, type VisaSlotSupport } fr
 import {
   centersFor,
   currencyOf,
+  symbolOf,
   findDestination,
   findOrigin,
   feeOf,
@@ -1012,15 +1013,15 @@ function BookingSuccess({ order, payCode }: { order: VisaOrderDTO; payCode: Visa
           >
             <p className="text-base font-bold text-ink">扫码付款</p>
             <p className="mt-1 text-xs leading-relaxed text-ink-soft">
-              请使用微信扫码，或长按/截图保存二维码至微信内完成支付。
+              请扫码支付，或长按/截图保存二维码后识别。
             </p>
             <img
               src={payCode.url}
-              alt="微信支付二维码"
+              alt="收款二维码"
               className="mx-auto mt-4 w-44 rounded-2xl bg-white object-contain"
             />
             <p className="mt-3 text-2xl font-extrabold text-brand">
-              {currencyOf(payCode.currency).symbol}
+              {symbolOf(payCode.currency)}
               {payCode.pay_amount}
             </p>
             {payCode.currency !== currencyOf(order.origin_code).code && (

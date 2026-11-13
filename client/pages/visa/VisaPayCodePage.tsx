@@ -331,7 +331,7 @@ export function VisaPayCodePage() {
               <Input
                 value={label}
                 onChange={(event) => setLabel(event.target.value)}
-                placeholder="例如：微信收款"
+                placeholder="例如：收款码"
               />
             </label>
             <label className="flex items-center gap-2 text-xs">
