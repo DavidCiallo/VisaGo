@@ -701,10 +701,10 @@ export class VisaService {
 
         const settings = await this.getSettings();
         const currency = currencyOf(order.origin_code).code;
-        // 只收人民币，英国订单按当天汇率折过来找码；查不到汇率就用后台填的兜底
+        // 只收人民币，英国订单折过来找码；手填的优先，没填才用自动查到的
         if (currency === "GBP") {
-            const live = await gbpToCny();
-            const rate = live?.rate ?? fxRate(settings);
+            const manual = fxRate(settings);
+            const rate = manual > 0 ? manual : ((await gbpToCny())?.rate ?? 0);
             if (rate > 0) {
                 return await this.findPayCode(Math.round(order.total * rate), "CNY");
             }

@@ -482,11 +482,13 @@ export function VisaSettingsPage() {
                 刷新
               </Button>
               <span className="text-muted-foreground text-xs">
-                {fx ? `${fx.date} · ${fx.source}，每 6 小时自动更新` : "暂时查不到，用下面的兜底汇率"}
+                {fx
+                  ? `${fx.date} · ${fx.source}，每 6 小时自动更新；这是中间价，支付宝按银行价会略高`
+                  : "暂时查不到，用下面的手填汇率"}
               </span>
             </div>
             <label className="flex flex-wrap items-center gap-3">
-              <span className="text-muted-foreground text-xs">兜底汇率</span>
+              <span className="text-muted-foreground text-xs">手填汇率</span>
               <Input
                 type="number"
                 min={0}
@@ -497,7 +499,7 @@ export function VisaSettingsPage() {
                 onChange={(event) => updateFx(Number(event.target.value) || 0)}
               />
               <span className="text-muted-foreground text-xs">
-                自动查不到时用它；填 0 就不折
+                填了就按这个收，留 0 用上面的自动汇率
               </span>
             </label>
           </CardContent>
