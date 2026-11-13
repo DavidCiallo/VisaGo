@@ -163,10 +163,6 @@ export function VisaSettingsPage() {
     })
   }
 
-  function updateFx(value: number) {
-    setSettings((current) => (current ? { ...current, fx_gbp_cny: Math.max(0, value) } : current))
-  }
-
   function updateCenter(countryCode: string, index: number, patch: Partial<VisaCenter>) {
     updateDestination(countryCode, (destination) => ({
       ...destination,
@@ -474,7 +470,7 @@ export function VisaSettingsPage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-base">汇率</CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-3">
+          <CardContent>
             <div className="flex flex-wrap items-center gap-3">
               <span className="text-muted-foreground text-xs">1 英镑 =</span>
               <span className="text-sm font-semibold">{fx ? fx.rate.toFixed(4) : "—"} 人民币</span>
@@ -482,18 +478,6 @@ export function VisaSettingsPage() {
                 刷新
               </Button>
             </div>
-            <label className="flex flex-wrap items-center gap-3">
-              <span className="text-muted-foreground text-xs">手填汇率</span>
-              <Input
-                type="number"
-                min={0}
-                step={0.01}
-                className="h-8 w-24"
-                value={settings.fx_gbp_cny ?? 0}
-                onFocus={(event) => event.target.select()}
-                onChange={(event) => updateFx(Number(event.target.value) || 0)}
-              />
-            </label>
           </CardContent>
         </Card>
       )}

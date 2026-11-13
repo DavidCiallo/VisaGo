@@ -14,7 +14,6 @@ import {
     currencyOf,
     feeOf,
     findDestination,
-    fxRate,
     findOrigin,
     materialsPlan,
     normalizeSettings,
@@ -41,8 +40,6 @@ interface VisaSettingsRow {
     update_time: number | null;
     delete_time: number | null;
     materials: VisaMaterials;
-    /** 1 英镑折多少人民币 */
-    fx_gbp_cny?: number;
     origins: VisaOrigin[];
 }
 
@@ -138,7 +135,6 @@ export class VisaService {
         const row = await visaSettingsRepository.findOne({});
         const fields = {
             materials: settings.materials,
-            fx_gbp_cny: settings.fx_gbp_cny ?? 0,
             origins: settings.origins,
         };
         if (row) {
@@ -699,12 +695,10 @@ export class VisaService {
     static async payCodeFor(order: VisaOrderEntity) {
         if (order.status !== "new") return null;
 
-        const settings = await this.getSettings();
         const currency = currencyOf(order.origin_code).code;
-        // 只收人民币，英国订单折过来找码；手填的优先，没填才用自动查到的
+        // 只收人民币，英国订单按汇率折过来找码
         if (currency === "GBP") {
-            const manual = fxRate(settings);
-            const rate = manual > 0 ? manual : ((await gbpToCny())?.rate ?? 0);
+            const rate = (await gbpToCny())?.rate ?? 0;
             if (rate > 0) {
                 return await this.findPayCode(Math.round(order.total * rate), "CNY");
             }

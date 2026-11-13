@@ -52,15 +52,7 @@ export interface VisaOrigin {
 export interface VisaSettings {
     /** 材料组的积压时长，决定最早能约到哪天 */
     materials: VisaMaterials;
-    /** 1 英镑折多少人民币，0 表示不折算；英国订单收款用它 */
-    fx_gbp_cny?: number;
     origins: VisaOrigin[];
-}
-
-/** 收款只收人民币，英国订单要按这个汇率折过来 */
-export function fxRate(settings: VisaSettings | null | undefined): number {
-    const value = Number(settings?.fx_gbp_cny);
-    return Number.isFinite(value) && value > 0 ? value : 0;
 }
 
 export interface VisaMaterials {
@@ -173,7 +165,6 @@ function buildCenters(origin: VisaOriginCode, country: string, names: string[]):
 export function buildDefaultSettings(): VisaSettings {
     return {
         materials: DEFAULT_MATERIALS,
-        fx_gbp_cny: 0,
         origins: (["CN", "UK"] as VisaOriginCode[]).map((code) => ({
             code,
             label: VISA_ORIGIN_LABELS[code],
@@ -334,7 +325,6 @@ export function normalizeSettings(input: any): VisaSettings {
                 ? Math.max(0, Math.floor(rawWorkdays))
                 : derived,
         },
-        fx_gbp_cny: fxRate(input),
         origins,
     };
 }
