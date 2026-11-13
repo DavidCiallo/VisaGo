@@ -414,8 +414,8 @@ export function VisaSettingsPage() {
 
       {settings && (
         <Card>
-          <CardContent className="divide-y">
-            <div className="grid gap-2 pb-4">
+          <CardContent className="grid gap-6 md:grid-cols-3">
+            <div className="grid gap-2 md:pr-6">
               <p className="text-sm font-semibold">材料组排期</p>
               <div className="flex flex-wrap items-end gap-4">
                 <label className="grid gap-1.5">
@@ -437,7 +437,7 @@ export function VisaSettingsPage() {
               </div>
             </div>
 
-            <div className="grid gap-2 py-4">
+            <div className="grid gap-2 md:border-l md:px-6">
               <p className="text-sm font-semibold">汇兑磨损</p>
               <label className="flex flex-wrap items-center gap-3">
                 <span className="text-muted-foreground text-xs">每人</span>
@@ -456,7 +456,7 @@ export function VisaSettingsPage() {
               </label>
             </div>
 
-            <div className="grid gap-2 pt-4">
+            <div className="grid gap-2 md:border-l md:pl-6">
               <p className="text-sm font-semibold">汇率</p>
               <div className="flex flex-wrap items-center gap-3">
                 <span className="text-muted-foreground text-xs">1 英镑 =</span>
