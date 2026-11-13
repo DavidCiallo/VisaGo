@@ -46,6 +46,7 @@ import {
     VisaFxResponse,
     VisaPassportPhotoInput,
     VisaPassportPhotoResponse,
+    VisaNotifyTestResponse,
 } from "./visa.interface";
 
 export const visaRoutes = {
@@ -60,6 +61,11 @@ export const visaRoutes = {
         path: "/save-settings",
         request: {} as VisaSaveSettingsInput,
         response: {} as VisaSettingsResponse,
+    },
+    notifyTest: {
+        path: "/notify-test",
+        request: {} as VisaOrdersInput,
+        response: {} as VisaNotifyTestResponse,
     },
     passportPhotos: {
         path: "/passport-photos",

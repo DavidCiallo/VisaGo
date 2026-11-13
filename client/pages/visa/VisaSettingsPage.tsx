@@ -163,6 +163,28 @@ export function VisaSettingsPage() {
     })
   }
 
+  function updateNotify(patch: Partial<NonNullable<VisaSettings["notify"]>>) {
+    setSettings((current) =>
+      current
+        ? {
+            ...current,
+            notify: {
+              qq_url: current.notify?.qq_url ?? "",
+              qq_token: current.notify?.qq_token ?? "",
+              qq_target: current.notify?.qq_target ?? "",
+              ...patch,
+            },
+          }
+        : current,
+    )
+  }
+
+  async function testNotify() {
+    const res = await visaApi.notifyTest({ auth: getAuth() })
+    if (res.success) toast.success("已发出去")
+    else toast.error(res.message || "发送失败")
+  }
+
   function updateCenter(countryCode: string, index: number, patch: Partial<VisaCenter>) {
     updateDestination(countryCode, (destination) => ({
       ...destination,
@@ -465,6 +487,52 @@ export function VisaSettingsPage() {
                   刷新
                 </Button>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {settings && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">通知</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-3">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="grid gap-1.5">
+                <span className="text-muted-foreground text-xs">qqbridge 地址</span>
+                <Input
+                  value={settings.notify?.qq_url ?? ""}
+                  onChange={(event) => updateNotify({ qq_url: event.target.value })}
+                  placeholder="http://127.0.0.1:18080"
+                />
+              </label>
+              <label className="grid gap-1.5">
+                <span className="text-muted-foreground text-xs">会话 ID</span>
+                <Input
+                  value={settings.notify?.qq_target ?? ""}
+                  onChange={(event) => updateNotify({ qq_target: event.target.value })}
+                  placeholder="群号或私聊会话"
+                />
+              </label>
+              <label className="grid gap-1.5 sm:col-span-2">
+                <span className="text-muted-foreground text-xs">访问令牌</span>
+                <Input
+                  value={settings.notify?.qq_token ?? ""}
+                  onChange={(event) => updateNotify({ qq_token: event.target.value })}
+                  placeholder="没有就留空"
+                />
+              </label>
+            </div>
+            <div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7"
+                onClick={() => void testNotify()}
+              >
+                发条测试消息
+              </Button>
             </div>
           </CardContent>
         </Card>

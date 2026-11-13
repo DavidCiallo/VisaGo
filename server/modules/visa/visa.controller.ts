@@ -55,6 +55,12 @@ async function saveSettings(request: VisaSaveSettingsInput) {
     return { settings: await VisaService.saveSettings(req.settings) };
 }
 
+async function notifyTest(request: VisaOrdersInput) {
+    requireLogin(request);
+
+    return await VisaService.notifyTest();
+}
+
 async function passportPhotos(request: VisaPassportPhotoInput) {
     requireLogin(request);
 
@@ -320,6 +326,7 @@ export const visaMount = {
         settings,
         saveSettings,
         fx,
+        notifyTest,
         passportPhotos,
         create,
         orders,

@@ -253,6 +253,12 @@ export interface VisaOrderResponse {
 }
 
 /** 后台维护的收款码：一个金额对应一张码。 */
+export interface VisaNotifyTestResponse {
+    success: boolean;
+    data?: { ok: boolean };
+    message?: string;
+}
+
 export interface VisaPassportPhotoInput {
     id: string;
     auth?: string;

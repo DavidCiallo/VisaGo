@@ -59,7 +59,26 @@ export interface VisaOrigin {
 export interface VisaSettings {
     /** 材料组的积压时长，决定最早能约到哪天 */
     materials: VisaMaterials;
+    /** QQ 通知，地址和会话都填了才算开启 */
+    notify?: VisaNotify;
     origins: VisaOrigin[];
+}
+
+export interface VisaNotify {
+    /** qqbridge 地址，例如 http://127.0.0.1:18080 */
+    qq_url: string;
+    /** 访问令牌，可留空 */
+    qq_token: string;
+    /** 默认会话 ID */
+    qq_target: string;
+}
+
+export function notifyOf(settings: VisaSettings | null | undefined): VisaNotify {
+    return {
+        qq_url: String(settings?.notify?.qq_url ?? "").trim(),
+        qq_token: String(settings?.notify?.qq_token ?? "").trim(),
+        qq_target: String(settings?.notify?.qq_target ?? "").trim(),
+    };
 }
 
 export interface VisaMaterials {
@@ -172,6 +191,7 @@ function buildCenters(origin: VisaOriginCode, country: string, names: string[]):
 export function buildDefaultSettings(): VisaSettings {
     return {
         materials: DEFAULT_MATERIALS,
+        notify: { qq_url: "", qq_token: "", qq_target: "" },
         origins: (["CN", "UK"] as VisaOriginCode[]).map((code) => ({
             code,
             label: VISA_ORIGIN_LABELS[code],
@@ -332,6 +352,7 @@ export function normalizeSettings(input: any): VisaSettings {
                 ? Math.max(0, Math.floor(rawWorkdays))
                 : derived,
         },
+        notify: notifyOf(input),
         origins,
     };
 }

@@ -33,6 +33,7 @@ import {
 } from "../../../shared/modules/visa/visa.interface";
 import { ocrConfigured, recognizePassport, recognizeWords } from "./visa.ocr";
 import { gbpToCny } from "./visa.fx";
+import { notifyConfigured, sendQQ } from "./visa.notify";
 
 interface VisaSettingsRow {
     id: string;
@@ -145,6 +146,7 @@ export class VisaService {
         const row = await visaSettingsRepository.findOne({});
         const fields = {
             materials: settings.materials,
+            notify: settings.notify ?? { qq_url: "", qq_token: "", qq_target: "" },
             origins: settings.origins,
         };
         if (row) {
@@ -622,7 +624,25 @@ export class VisaService {
             extras_fee: quote.extrasFee,
             total: quote.toPay,
             status: "new",
+        }).then((order) => {
+            void this.notifyNewOrder(order).catch(() => {});
+            return order;
         });
+    }
+
+    /** 新订单推一条 QQ，发不出去不影响下单。 */
+    static async notifyNewOrder(order: VisaOrderEntity) {
+        const settings = await this.getSettings();
+        if (!notifyConfigured(settings)) return;
+
+        const currency = currencyOf(order.origin_code).symbol;
+        const origin = VISA_ORIGIN_LABELS[order.origin_code as VisaOriginCode] ?? order.origin_code;
+        const country = findCountry(order.country_code);
+        const who = [order.customer_name, order.customer_phone].filter(Boolean).join(" ");
+        await sendQQ(
+            settings,
+            `【VisaGo】新订单 ${order.id.toUpperCase()}：${country?.name ?? order.country_code} ${country?.visa ?? ""}，${origin}出发，${order.travelers} 人，${currency}${order.total}，${who}`,
+        );
     }
 
     static async getInvite(token: string) {
@@ -717,6 +737,16 @@ export class VisaService {
     }
 
     /** 只做识别并写回字段，图片本身不落盘。 */
+    /** 后台点一下，看配置到底通不通。 */
+    static async notifyTest() {
+        const settings = await this.getSettings();
+        if (!notifyConfigured(settings)) throw new Error("先填通知地址和会话 ID");
+
+        const res = await sendQQ(settings, `【VisaGo】测试消息，收到说明通知已通。${new Date().toLocaleString("zh-CN")}`);
+        if (!res.ok) throw new Error(res.error || "发送失败");
+        return { ok: true };
+    }
+
     /** 客户上传的护照照片留一份，后台要核对原件。 */
     static async savePassportPhoto(token: string, index: number, image: string) {
         const imageId = writeUpload(image).id;
