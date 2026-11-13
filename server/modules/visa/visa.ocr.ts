@@ -124,6 +124,7 @@ export function toPassportDetails(fields: Record<string, string>): PassportDetai
   return {
     first_name,
     last_name,
+    phone: "",
     birth_date: toIsoDate(fields.birthDateYmd || fields.birthDate),
     gender: toGender(fields.sex || fields.gender),
     nationality: toNationality(fields),

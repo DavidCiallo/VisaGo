@@ -22,16 +22,11 @@ function filled(passport: PassportDetails | undefined) {
 export function PassportStep({
   passports,
   travelerCount,
-  phone,
   onChange,
-  onPhoneChange,
 }: {
   passports: PassportDetails[]
   travelerCount: number
-  /** 邀请页不给联系方式，传了才显示这一行 */
-  phone?: string
   onChange: (index: number, patch: Partial<PassportDetails>) => void
-  onPhoneChange?: (value: string) => void
 }) {
   const [active, setActive] = useState(0)
   const [mode, setMode] = useState<Mode>("intro")
@@ -255,6 +250,16 @@ export function PassportStep({
                 placeholder="WEI"
               />
             </Field>
+            <Field label="手机号">
+              <input
+                type="tel"
+                inputMode="tel"
+                className={inputClass}
+                value={passport.phone ?? ""}
+                onChange={(event) => edit({ phone: event.target.value })}
+                placeholder="13800138000"
+              />
+            </Field>
             <Field label="出生日期">
               <input
                 type="date"
@@ -342,19 +347,6 @@ export function PassportStep({
         </div>
       )}
 
-      {onPhoneChange && (
-        <div className="mt-6 grid gap-1.5 border-t border-line/70 pt-4">
-          <span className="text-xs font-semibold text-ink-soft">手机号</span>
-          <input
-            type="tel"
-            inputMode="tel"
-            className={inputClass}
-            value={phone ?? ""}
-            onChange={(event) => onPhoneChange(event.target.value)}
-            placeholder="例如 13800138000"
-          />
-        </div>
-      )}
     </StepCard>
   )
 }

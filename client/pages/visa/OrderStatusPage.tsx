@@ -595,6 +595,7 @@ export function OrderStatusPage() {
               const rows: [string, string][] = [
                 ["姓", item.last_name],
                 ["名", item.first_name],
+                ["手机号", item.phone ?? ""],
                 ["出生日期", item.birth_date],
                 ["性别", item.gender],
                 ["国籍", item.nationality],

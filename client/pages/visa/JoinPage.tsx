@@ -15,6 +15,7 @@ type InviteOrder = NonNullable<VisaInviteResponse["data"]>["order"]
 const emptyPassport: PassportDetails = {
   first_name: "",
   last_name: "",
+  phone: "",
   birth_date: "",
   gender: "",
   nationality: "",

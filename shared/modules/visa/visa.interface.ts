@@ -46,9 +46,12 @@ export function normalizeEmail(email: string): string {
 }
 
 export function toPassportDetails(raw: any): PassportDetails {
-    return Object.fromEntries(
-        passportFields.map((field) => [field, String(raw?.[field] ?? "")]),
-    ) as unknown as PassportDetails;
+    return {
+        ...(Object.fromEntries(
+            passportFields.map((field) => [field, String(raw?.[field] ?? "")]),
+        ) as unknown as PassportDetails),
+        phone: String(raw?.phone ?? ""),
+    };
 }
 
 export function passportFilled(passport: PassportDetails | undefined): boolean {

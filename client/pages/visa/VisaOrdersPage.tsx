@@ -415,6 +415,7 @@ export function VisaOrdersPage() {
                         />
                         <Field label="出生日期" value={passport.birth_date} />
                         <Field label="性别" value={passport.gender} />
+                        <Field label="手机号" value={passport.phone} />
                         <Field label="国籍" value={passport.nationality} />
                         <Field label="出生地" value={passport.birth_place} />
                         <Field label="护照号" value={passport.passport_number} />

@@ -10,6 +10,8 @@ import { VISA_ORIGIN_LABELS, type VisaOriginCode } from "./visa.settings";
 export interface PassportDetails {
     first_name: string;
     last_name: string;
+    /** 出行人自己的手机号 */
+    phone: string;
     birth_date: string;
     gender: string;
     nationality: string;
