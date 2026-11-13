@@ -253,6 +253,17 @@ export interface VisaOrderResponse {
 }
 
 /** 后台维护的收款码：一个金额对应一张码。 */
+export interface VisaPassportPhotoInput {
+    id: string;
+    auth?: string;
+}
+
+export interface VisaPassportPhotoResponse {
+    success: boolean;
+    data?: { photos: { index: number; url: string }[] };
+    message?: string;
+}
+
 export interface VisaFxResponse {
     success: boolean;
     /** 查不到就是 null，前端显示兜底汇率 */

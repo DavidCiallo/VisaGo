@@ -95,6 +95,7 @@ export function VisaOrdersPage() {
   const [archived, setArchived] = useState<VisaOrderDTO[]>([])
   const [archiveOpen, setArchiveOpen] = useState(false)
   const [confirmCancel, setConfirmCancel] = useState(false)
+  const [photos, setPhotos] = useState<{ index: number; url: string }[]>([])
   const letterInput = useRef<HTMLInputElement>(null)
 
   async function loadArchived() {
@@ -144,6 +145,13 @@ export function VisaOrdersPage() {
   function openOrder(order: VisaOrderDTO) {
     setSelected(order)
     setPositionDraft(order.position)
+    setPhotos([])
+    void loadPhotos(order.id)
+  }
+
+  async function loadPhotos(id: string) {
+    const res = await visaApi.passportPhotos({ id, auth: getAuth() })
+    if (res.success) setPhotos(res.data?.photos ?? [])
   }
 
   function applyOrder(updated: VisaOrderDTO) {
@@ -403,9 +411,31 @@ export function VisaOrdersPage() {
                 <div className="space-y-2">
                   {selected.passports.map((passport, index) => (
                     <div key={index} className="space-y-2 rounded-md border p-3">
-                      <p className="text-muted-foreground text-xs font-semibold">
-                        出行人 {index + 1}
-                      </p>
+                      <div className="flex items-start justify-between gap-3">
+                        <p className="text-muted-foreground text-xs font-semibold">
+                          出行人 {index + 1}
+                        </p>
+                        {photos.find((photo) => photo.index === index) && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              window.open(
+                                photos.find((photo) => photo.index === index)!.url,
+                                "_blank",
+                                "noopener",
+                              )
+                            }
+                            className="shrink-0 overflow-hidden rounded border transition hover:opacity-80"
+                            title="查看护照照片"
+                          >
+                            <img
+                              src={photos.find((photo) => photo.index === index)!.url}
+                              alt="护照照片"
+                              className="h-16 w-24 bg-white object-cover"
+                            />
+                          </button>
+                        )}
+                      </div>
                       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                         <Field
                           label="名/姓"

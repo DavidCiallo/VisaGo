@@ -73,6 +73,16 @@ interface VisaPayCodeEntity {
 
 const visaPayCodeRepository: Repository<VisaPayCodeEntity> = Repository.instance("VisaPayCode");
 
+interface VisaPassportPhotoEntity {
+    id: string;
+    order_token: string;
+    index: number;
+    image_id: string;
+}
+
+const visaPassportPhotoRepository: Repository<VisaPassportPhotoEntity> =
+    Repository.instance("VisaPassportPhoto");
+
 const UPLOAD_DIR = process.env.DATA_DIR
     ? path.join(path.resolve(process.env.DATA_DIR), "uploads")
     : path.join(
@@ -707,12 +717,38 @@ export class VisaService {
     }
 
     /** 只做识别并写回字段，图片本身不落盘。 */
+    /** 客户上传的护照照片留一份，后台要核对原件。 */
+    static async savePassportPhoto(token: string, index: number, image: string) {
+        const imageId = writeUpload(image).id;
+        const rows = await visaPassportPhotoRepository.find({ order_token: token, index });
+        if (rows[0]) {
+            await visaPassportPhotoRepository.update(
+                { id: rows[0].id },
+                { image_id: imageId },
+            );
+        } else {
+            await visaPassportPhotoRepository.insert({ order_token: token, index, image_id: imageId });
+        }
+    }
+
+    static async passportPhotos(id: string) {
+        const order = await visaOrderRepository.findOne({ id });
+        if (!order) throw new Error("订单不存在");
+
+        const rows = await visaPassportPhotoRepository.find({ order_token: order.invite_token });
+        return rows
+            .sort((a, b) => a.index - b.index)
+            .map((row) => ({ index: row.index, url: `/api/visa/file?id=${row.image_id}` }));
+    }
+
     static async scanPassport(token: string, index: number, image: string, key: string) {
         const order = await this.authorize(token, key);
         if (order.status === "locked" || order.status === "cancelled") {
             throw new Error("订单已锁定，如需修改请联系签证专员");
         }
         if (index < 0 || index >= order.passports.length) throw new Error("没有这位出行人");
+
+        await this.savePassportPhoto(order.invite_token, index, image);
 
         let recognized = false;
         if (ocrConfigured()) {

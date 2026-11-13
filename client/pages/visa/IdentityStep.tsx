@@ -168,7 +168,7 @@ export function IdentityStep({
             </PolicySection>
 
             <PolicySection title="二、 证件影像安全承诺">
-              您上传的护照首页照片仅用于当次实时信息提取。识别完成后，原始图片将立即从内存及服务器中自动销毁，系统不保存、不留存任何影像副本，仅保留提取后的必要文本数据。
+              您上传的护照首页照片用于提取证件信息，同时留存一份供签证专员核对原件。该影像仅用于办理本订单的签证，不用于其他用途，也不向第三方提供。
             </PolicySection>
 
             <PolicySection title="三、 信息使用目的">

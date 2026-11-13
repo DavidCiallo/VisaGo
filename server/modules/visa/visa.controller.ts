@@ -18,6 +18,7 @@ import {
     VisaOrderUpdateInput,
     VisaOrderUpdateRequest,
     VisaPassportScanInput,
+    VisaPassportPhotoInput,
     VisaRemoveTravelerInput,
     VisaOcrInput,
     VisaOrderAttachInput,
@@ -52,6 +53,12 @@ async function saveSettings(request: VisaSaveSettingsInput) {
     const req = VisaSaveSettingsRequest.self(request);
 
     return { settings: await VisaService.saveSettings(req.settings) };
+}
+
+async function passportPhotos(request: VisaPassportPhotoInput) {
+    requireLogin(request);
+
+    return { photos: await VisaService.passportPhotos(request.id) };
 }
 
 async function fx() {
@@ -313,6 +320,7 @@ export const visaMount = {
         settings,
         saveSettings,
         fx,
+        passportPhotos,
         create,
         orders,
         invite,
