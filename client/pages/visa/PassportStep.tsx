@@ -353,7 +353,6 @@ export function PassportStep({
             onChange={(event) => onPhoneChange(event.target.value)}
             placeholder="例如 13800138000"
           />
-          <span className="text-[11px] text-ink-soft/70">用来联系您办签，必填。</span>
         </div>
       )}
     </StepCard>

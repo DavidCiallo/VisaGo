@@ -341,7 +341,7 @@ export function VisaPayCodePage() {
                 onChange={(event) => setFallback(event.target.checked)}
                 className="size-3.5"
               />
-              设为兜底码（没有金额匹配时用它）
+              设为兜底码
             </label>
             <div>
               <Button onClick={save} disabled={saving}>

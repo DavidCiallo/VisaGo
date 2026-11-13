@@ -588,7 +588,6 @@ export function VisaOrdersPage() {
         <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>已归档的订单</DialogTitle>
-            <DialogDescription>恢复后会回到订单列表。</DialogDescription>
           </DialogHeader>
           {archived.length === 0 ? (
             <p className="text-muted-foreground text-sm">还没有归档的订单。</p>

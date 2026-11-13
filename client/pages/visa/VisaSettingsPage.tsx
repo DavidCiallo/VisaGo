@@ -462,7 +462,7 @@ export function VisaSettingsPage() {
                 onChange={(event) => updateFee(Number(event.target.value) || 0)}
               />
               <span className="text-muted-foreground text-xs">
-                {currencyOf(originCode).symbol}，跟签证费一起收，为代付产生的汇兑与通道损耗
+                {currencyOf(originCode).symbol}
               </span>
             </label>
           </CardContent>
@@ -481,11 +481,6 @@ export function VisaSettingsPage() {
               <Button size="sm" variant="outline" className="h-7" onClick={() => void loadFx()}>
                 刷新
               </Button>
-              <span className="text-muted-foreground text-xs">
-                {fx
-                  ? `${fx.date} · ${fx.source}，中间价加 0.5%，每 6 小时自动更新`
-                  : "暂时查不到，用下面的手填汇率"}
-              </span>
             </div>
             <label className="flex flex-wrap items-center gap-3">
               <span className="text-muted-foreground text-xs">手填汇率</span>
@@ -498,9 +493,6 @@ export function VisaSettingsPage() {
                 onFocus={(event) => event.target.select()}
                 onChange={(event) => updateFx(Number(event.target.value) || 0)}
               />
-              <span className="text-muted-foreground text-xs">
-                填了就按这个收，留 0 用上面的自动汇率
-              </span>
             </label>
           </CardContent>
         </Card>
