@@ -444,13 +444,13 @@ export function VisaOrdersPage() {
                             .join(" ")}
                         />
                         <Field label="出生日期" value={passport.birth_date} />
-                        <Field label="手机号" value={passport.phone} />
                         <Field label="性别" value={passport.gender} />
                         <Field label="国籍" value={passport.nationality} />
                         <Field label="出生地" value={passport.birth_place} />
                         <Field label="护照号" value={passport.passport_number} />
                         <Field label="签发日期" value={passport.issue_date} />
                         <Field label="有效期至" value={passport.expiry_date} />
+                        <Field label="手机号" value={passport.phone} />
                       </div>
                     </div>
                   ))}
