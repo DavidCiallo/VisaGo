@@ -80,7 +80,6 @@ export function VisaSettingsPage() {
   const [activeCenters, setActiveCenters] = useState<Record<string, number>>({})
   const [activeCountry, setActiveCountry] = useState(VISA_COUNTRIES[0]?.code ?? "")
   const [loading, setLoading] = useState(true)
-  const [fx, setFx] = useState<{ rate: number; date: string; source: string } | null>(null)
   const [loadFailed, setLoadFailed] = useState(false)
   const [saving, setSaving] = useState(false)
   const [scanning, setScanning] = useState(false)
@@ -119,14 +118,9 @@ export function VisaSettingsPage() {
     }
   }
 
-  async function loadFx() {
-    const res = await visaApi.fx({})
-    if (res.success) setFx(res.data?.fx ?? null)
-  }
 
   useEffect(() => {
     load()
-    void loadFx()
   }, [])
 
   function updateDestination(
@@ -151,17 +145,6 @@ export function VisaSettingsPage() {
     })
   }
 
-  function updateFee(value: number) {
-    setSettings((current) => {
-      if (!current) return current
-      return {
-        ...current,
-        origins: current.origins.map((item) =>
-          item.code === originCode ? { ...item, fee: Math.max(0, value) } : item,
-        ),
-      }
-    })
-  }
 
   function updateNotify(patch: Partial<NonNullable<VisaSettings["notify"]>>) {
     setSettings((current) =>
@@ -436,8 +419,8 @@ export function VisaSettingsPage() {
 
       {settings && (
         <Card>
-          <CardContent className="grid gap-6 md:grid-cols-3">
-            <div className="grid gap-2 md:pr-6">
+          <CardContent className="grid gap-6">
+            <div className="grid gap-2">
               <p className="text-sm font-semibold">材料组排期</p>
               <div className="flex flex-wrap items-end gap-4">
                 <label className="grid gap-1.5">
@@ -459,37 +442,7 @@ export function VisaSettingsPage() {
               </div>
             </div>
 
-            <div className="grid gap-2 md:border-l md:px-6">
-              <p className="text-sm font-semibold">汇兑磨损</p>
-              <label className="flex flex-wrap items-center gap-3">
-                <span className="text-muted-foreground text-xs">每人</span>
-                <Input
-                  type="number"
-                  min={0}
-                  step={1}
-                  className="h-8 w-24"
-                  value={origin?.fee ?? 0}
-                  onFocus={(event) => event.target.select()}
-                  onChange={(event) => updateFee(Number(event.target.value) || 0)}
-                />
-                <span className="text-muted-foreground text-xs">
-                  {currencyOf(originCode).symbol}
-                </span>
-              </label>
-            </div>
-
-            <div className="grid gap-2 md:border-l md:pl-6">
-              <p className="text-sm font-semibold">汇率</p>
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="text-muted-foreground text-xs">1 英镑 =</span>
-                <span className="text-sm font-semibold">{fx ? fx.rate.toFixed(4) : "—"} 人民币</span>
-                <Button size="sm" variant="outline" className="h-7" onClick={() => void loadFx()}>
-                  刷新
-                </Button>
-              </div>
-            </div>
-
-            <div className="grid gap-3 md:col-span-3 md:border-t md:pt-6">
+            <div className="grid gap-3 md:border-t md:pt-6">
               <p className="text-sm font-semibold">通知</p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <label className="grid gap-1.5">

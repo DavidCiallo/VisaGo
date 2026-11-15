@@ -29,6 +29,7 @@ import {
   currencyOf,
   VISA_ORIGIN_LABELS,
   type VisaOriginCode,
+  type VisaSettings,
 } from "@/shared/modules/visa/visa.settings"
 import type { VisaOrderDTO } from "@/shared/modules/visa/visa.entity"
 
@@ -96,7 +97,35 @@ export function VisaOrdersPage() {
   const [archiveOpen, setArchiveOpen] = useState(false)
   const [confirmCancel, setConfirmCancel] = useState(false)
   const [photos, setPhotos] = useState<{ index: number; url: string }[]>([])
+  const [settings, setSettings] = useState<VisaSettings | null>(null)
+  const [fx, setFx] = useState<{ rate: number; date: string; source: string } | null>(null)
   const letterInput = useRef<HTMLInputElement>(null)
+
+  async function loadSettings() {
+    const res = await visaApi.settings({})
+    if (res.success && res.data?.settings) setSettings(res.data.settings)
+  }
+
+  async function loadFx() {
+    const res = await visaApi.fx({})
+    if (res.success) setFx(res.data?.fx ?? null)
+  }
+
+  async function saveSettings(next: VisaSettings) {
+    setSettings(next)
+    const res = await visaApi.saveSettings({ settings: next, auth: getAuth() })
+    if (!res.success) toast.error(res.message || "保存失败")
+  }
+
+  function updateFee(code: VisaOriginCode, value: number) {
+    if (!settings) return
+    void saveSettings({
+      ...settings,
+      origins: settings.origins.map((item) =>
+        item.code === code ? { ...item, fee: Math.max(0, value) } : item,
+      ),
+    })
+  }
 
   async function loadArchived() {
     const res = await visaApi.archivedOrders({ auth: getAuth() })
@@ -140,6 +169,8 @@ export function VisaOrdersPage() {
 
   useEffect(() => {
     load()
+    void loadSettings()
+    void loadFx()
   }, [])
 
   function openOrder(order: VisaOrderDTO) {
@@ -265,6 +296,56 @@ export function VisaOrdersPage() {
           </Button>
         </div>
       </div>
+
+      {settings && (
+        <Card>
+          <CardContent className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-2">
+              <p className="text-sm font-semibold">汇兑磨损</p>
+              <div className="flex flex-wrap items-end gap-4">
+                {settings.origins.map((item) => (
+                  <label key={item.code} className="grid gap-1.5">
+                    <span className="text-muted-foreground text-xs">{item.label}每人</span>
+                    <div className="flex items-center gap-1.5">
+                      <Input
+                        type="number"
+                        min={0}
+                        className="h-8 w-24"
+                        value={item.fee ?? 0}
+                        onFocus={(event) => event.target.select()}
+                        onChange={(event) =>
+                          updateFee(item.code, Number(event.target.value) || 0)
+                        }
+                      />
+                      <span className="text-muted-foreground text-xs">
+                        {currencyOf(item.code).symbol}
+                      </span>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid gap-2 md:border-l md:pl-6">
+              <p className="text-sm font-semibold">汇率</p>
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="text-muted-foreground text-xs">1 英镑 =</span>
+                <span className="text-sm font-semibold">
+                  {fx ? fx.rate.toFixed(4) : "—"} 人民币
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7"
+                  onClick={() => void loadFx()}
+                >
+                  刷新
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="flex flex-wrap items-center gap-2">
         <select
