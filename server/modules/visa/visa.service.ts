@@ -261,18 +261,24 @@ export class VisaService {
     }
 
     static async savePayCode(req: any) {
-        const amount = Math.round(Number(req?.amount));
         const currency = String(req?.currency ?? "").toUpperCase();
-        if (!Number.isFinite(amount) || amount <= 0) throw new Error("请填写正确的金额");
         if (!["CNY", "GBP"].includes(currency)) throw new Error("请选择币种");
 
+        const fallback = Boolean(req?.fallback);
+        const typed = Math.round(Number(req?.amount));
+        // 兜底码按订单金额收，自己的金额可以没有
+        const amount = Number.isFinite(typed) && typed > 0 ? typed : 0;
+        if (!fallback && amount <= 0) throw new Error("请填写正确的金额");
+
         const existing = req?.id ? await visaPayCodeRepository.findOne({ id: req.id }) : null;
+        if (!fallback && existing?.fallback && amount <= 0) {
+            throw new Error("先填金额，再取消兜底");
+        }
         let imageId = existing?.image_id ?? "";
         if (req?.image) imageId = writeUpload(req.image).id;
         if (!imageId) throw new Error("请上传收款码图片");
 
         const label = String(req?.label ?? "").trim().slice(0, 40);
-        const fallback = Boolean(req?.fallback);
         // 一个币种只留一张兜底码
         if (fallback) {
             const others = await visaPayCodeRepository.find({ currency });
@@ -289,7 +295,7 @@ export class VisaService {
                 { amount, currency, label, image_id: imageId, fallback, update_time: Date.now() },
             );
         } else {
-            const clash = await visaPayCodeRepository.find({ currency });
+            const clash = fallback ? [] : await visaPayCodeRepository.find({ currency });
             if (clash.some((row) => Math.round(row.amount) === amount)) {
                 throw new Error("这个金额已经有一张收款码了");
             }

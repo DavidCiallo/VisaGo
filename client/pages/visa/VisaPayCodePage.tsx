@@ -217,8 +217,8 @@ export function VisaPayCodePage() {
   }
 
   async function save() {
-    const value = Number(amount)
-    if (!Number.isFinite(value) || value <= 0) {
+    const value = fallback ? 0 : Number(amount)
+    if (!fallback && (!Number.isFinite(value) || value <= 0)) {
       toast.error("请填写正确的金额")
       return
     }
@@ -304,16 +304,27 @@ export function VisaPayCodePage() {
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={pick} />
 
           <div className="grid gap-3">
+            <label className="flex items-center gap-2 text-xs">
+              <input
+                type="checkbox"
+                checked={fallback}
+                onChange={(event) => setFallback(event.target.checked)}
+                className="size-3.5"
+              />
+              设为兜底码
+            </label>
             <div className="grid gap-1.5 sm:grid-cols-2">
-              <label className="grid gap-1.5">
-                <span className="text-muted-foreground text-xs">金额</span>
-                <Input
-                  value={amount}
-                  onChange={(event) => setAmount(event.target.value)}
-                  inputMode="numeric"
-                  placeholder="例如 120"
-                />
-              </label>
+              {!fallback && (
+                <label className="grid gap-1.5">
+                  <span className="text-muted-foreground text-xs">金额</span>
+                  <Input
+                    value={amount}
+                    onChange={(event) => setAmount(event.target.value)}
+                    inputMode="numeric"
+                    placeholder="例如 120"
+                  />
+                </label>
+              )}
               <label className="grid gap-1.5">
                 <span className="text-muted-foreground text-xs">币种</span>
                 <select
@@ -333,15 +344,6 @@ export function VisaPayCodePage() {
                 onChange={(event) => setLabel(event.target.value)}
                 placeholder="例如：收款码"
               />
-            </label>
-            <label className="flex items-center gap-2 text-xs">
-              <input
-                type="checkbox"
-                checked={fallback}
-                onChange={(event) => setFallback(event.target.checked)}
-                className="size-3.5"
-              />
-              设为兜底码
             </label>
             <div>
               <Button onClick={save} disabled={saving}>
@@ -384,13 +386,10 @@ export function VisaPayCodePage() {
                     className="aspect-square w-full rounded bg-white object-contain"
                   />
                   <div className="mt-1 space-y-0.5">
-                    <p
-                      className={cn("text-xs font-medium", code.fallback && "text-brand")}
-                      title={code.fallback ? "兜底码：没有金额匹配时用它" : undefined}
-                    >
-                      {code.fallback ? "★" : ""}
-                      {code.currency === "GBP" ? "£" : "¥"}
-                      {code.amount}
+                    <p className={cn("text-xs font-medium", code.fallback && "text-brand")}>
+                      {code.fallback
+                        ? "★ 兜底码"
+                        : `${code.currency === "GBP" ? "£" : "¥"}${code.amount}`}
                     </p>
                     {code.label && (
                       <p className="text-muted-foreground truncate text-[10px]">{code.label}</p>
