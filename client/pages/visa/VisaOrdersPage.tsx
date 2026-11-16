@@ -217,31 +217,40 @@ export function VisaOrdersPage() {
   }
 
   async function uploadLetter(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0]
+    const picked = Array.from(event.target.files ?? [])
     event.target.value = ""
-    if (!file || !selected) return
+    if (!picked.length || !selected) return
 
     setAttaching(true)
     try {
-      const data = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onload = () => resolve(String(reader.result ?? ""))
-        reader.onerror = () => reject(new Error("读取文件失败"))
-        reader.readAsDataURL(file)
-      })
+      let uploaded = 0
+      for (const file of picked) {
+        const data = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = () => resolve(String(reader.result ?? ""))
+          reader.onerror = () => reject(new Error("读取文件失败"))
+          reader.readAsDataURL(file)
+        })
 
-      const res = await visaApi.orderAttach({
-        id: selected.id,
-        name: file.name,
-        data,
-        auth: getAuth(),
-      })
-      if (res.success && res.data?.order) {
-        applyOrder(res.data.order)
-        toast.success("预约信已上传，订单已完成")
+        const res = await visaApi.orderAttach({
+          id: selected.id,
+          name: file.name,
+          data,
+          auth: getAuth(),
+        })
+        if (res.success && res.data?.order) {
+          uploaded += 1
+          applyOrder(res.data.order)
+        }
+      }
+
+      if (uploaded === 0) {
+        toast.error("上传失败")
         return
       }
-      toast.error(res.message || "上传失败")
+      toast.success(
+        uploaded > 1 ? `${uploaded} 份预约信已上传，订单已完成` : "预约信已上传，订单已完成",
+      )
     } finally {
       setAttaching(false)
     }
@@ -658,6 +667,7 @@ export function VisaOrdersPage() {
                         ref={letterInput}
                         type="file"
                         accept="application/pdf"
+                        multiple
                         className="hidden"
                         onChange={uploadLetter}
                       />
