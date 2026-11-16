@@ -19,6 +19,8 @@ import {
     VisaOrderUpdateRequest,
     VisaPassportScanInput,
     VisaPassportPhotoInput,
+    VisaLetterDatesInput,
+    VisaOrderScheduleInput,
     VisaRemoveTravelerInput,
     VisaOcrInput,
     VisaOrderAttachInput,
@@ -53,6 +55,19 @@ async function saveSettings(request: VisaSaveSettingsInput) {
     const req = VisaSaveSettingsRequest.self(request);
 
     return { settings: await VisaService.saveSettings(req.settings) };
+}
+
+async function letterDates(request: VisaLetterDatesInput) {
+    requireLogin(request);
+
+    return { dates: await VisaService.letterDates(request.id) };
+}
+
+async function orderSchedule(request: VisaOrderScheduleInput) {
+    requireLogin(request);
+    const row = await VisaService.setAppointmentTime(request.id, request.appointment_time);
+
+    return { order: await toDTO(row) };
 }
 
 async function notifyTest(request: VisaOrdersInput) {
@@ -326,6 +341,8 @@ export const visaMount = {
         settings,
         saveSettings,
         fx,
+        letterDates,
+        orderSchedule,
         notifyTest,
         passportPhotos,
         create,

@@ -253,6 +253,23 @@ export interface VisaOrderResponse {
 }
 
 /** 后台维护的收款码：一个金额对应一张码。 */
+export interface VisaLetterDatesInput {
+    id: string;
+    auth?: string;
+}
+
+export interface VisaLetterDatesResponse {
+    success: boolean;
+    data?: { dates: string[] };
+    message?: string;
+}
+
+export interface VisaOrderScheduleInput {
+    id: string;
+    appointment_time: string;
+    auth?: string;
+}
+
 export interface VisaNotifyTestResponse {
     success: boolean;
     data?: { ok: boolean };

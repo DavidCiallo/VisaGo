@@ -34,6 +34,7 @@ import {
 import { ocrConfigured, recognizePassport, recognizeWords } from "./visa.ocr";
 import { gbpToCny } from "./visa.fx";
 import { notifyConfigured, sendQQ } from "./visa.notify";
+import { extractPdfText, findDateTimes } from "./visa.pdf";
 
 interface VisaSettingsRow {
     id: string;
@@ -743,6 +744,33 @@ export class VisaService {
     }
 
     /** 只做识别并写回字段，图片本身不落盘。 */
+    /** 从订单的预约信 PDF 里抠日期时间，给后台挑。 */
+    static async letterDates(id: string) {
+        const order = await this.getById(id);
+        const dates = new Set<string>();
+
+        for (const file of order.files ?? []) {
+            if (!file.name.toLowerCase().endsWith(".pdf")) continue;
+            try {
+                const buffer = fs.readFileSync(this.resolveUpload(file.id));
+                for (const stamp of findDateTimes(extractPdfText(buffer))) dates.add(stamp);
+            } catch {
+                // 读不出来就跳过这一份
+            }
+        }
+
+        return [...dates].sort();
+    }
+
+    static async setAppointmentTime(id: string, value: string) {
+        const row = await this.getById(id);
+        await visaOrderRepository.update(
+            { id: row.id },
+            { appointment_time: String(value ?? "").slice(0, 120), update_time: Date.now() },
+        );
+        return await this.getById(id);
+    }
+
     /** 后台点一下，看配置到底通不通。 */
     static async notifyTest() {
         const settings = await this.getSettings();

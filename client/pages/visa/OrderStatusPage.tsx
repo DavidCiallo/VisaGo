@@ -298,6 +298,12 @@ export function OrderStatusPage() {
                 {order.appointment_city} · {order.appointment_dates.join("、")}
               </dd>
             </div>
+            {order.appointment_time && (
+              <div className="flex justify-between gap-3">
+                <dt className="shrink-0 text-ink-soft">预约时间</dt>
+                <dd className="text-right">{order.appointment_time}</dd>
+              </div>
+            )}
             <div className="flex justify-between gap-3">
               <dt className="text-ink-soft">出行计划</dt>
               <dd className="text-right">
