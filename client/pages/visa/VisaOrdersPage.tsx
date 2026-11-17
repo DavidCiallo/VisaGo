@@ -96,6 +96,7 @@ export function VisaOrdersPage() {
   const [selected, setSelected] = useState<VisaOrderDTO | null>(null)
   const [positionDraft, setPositionDraft] = useState("")
   const [noteDraft, setNoteDraft] = useState("")
+  const [datesDraft, setDatesDraft] = useState("")
   const [attaching, setAttaching] = useState(false)
   const [archived, setArchived] = useState<VisaOrderDTO[]>([])
   const [archiveOpen, setArchiveOpen] = useState(false)
@@ -187,6 +188,7 @@ export function VisaOrdersPage() {
     setSelected(order)
     setPositionDraft(order.position)
     setNoteDraft(order.appointment_note)
+    setDatesDraft(order.appointment_dates.join("、"))
     setCandidates([])
     setPhotos([])
     void loadPhotos(order.id)
@@ -233,6 +235,25 @@ export function VisaOrdersPage() {
     const res = await visaApi.orderNote({
       id: selected.id,
       appointment_note: noteDraft,
+      auth: getAuth(),
+    })
+    if (res.success && res.data?.order) {
+      applyOrder(res.data.order)
+      toast.success("已保存")
+      return
+    }
+    toast.error(res.message || "保存失败")
+  }
+
+  async function saveDates() {
+    if (!selected) return
+    const dates = datesDraft
+      .split(/[、,，\s]+/)
+      .map((item) => item.trim())
+      .filter(Boolean)
+    const res = await visaApi.orderDates({
+      id: selected.id,
+      appointment_dates: dates,
       auth: getAuth(),
     })
     if (res.success && res.data?.order) {
@@ -631,10 +652,18 @@ export function VisaOrdersPage() {
                 <p className="text-muted-foreground mb-2 text-xs font-semibold">递签</p>
                 <div className="grid gap-3">
                   <Field label="签证中心" value={selected.appointment_city} />
-                  <Field
-                    label="候选日期"
-                    value={selected.appointment_dates.map((iso) => formatDay(iso)).join("、")}
-                  />
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground text-xs">候选日期</span>
+                    <Input
+                      value={datesDraft}
+                      onChange={(event) => setDatesDraft(event.target.value)}
+                      placeholder="2026-11-30、2026-12-08"
+                      className="h-8 flex-1"
+                    />
+                    <Button size="sm" variant="outline" className="h-8" onClick={() => void saveDates()}>
+                      保存
+                    </Button>
+                  </div>
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground text-xs">备注</span>
                     <Input

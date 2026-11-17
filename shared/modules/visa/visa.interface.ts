@@ -414,6 +414,12 @@ export interface VisaOrderNoteInput {
     auth?: string;
 }
 
+export interface VisaOrderDatesInput {
+    id: string;
+    appointment_dates: string[];
+    auth?: string;
+}
+
 export interface VisaOrderAttachInput {
     id: string;
     name: string;

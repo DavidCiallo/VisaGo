@@ -346,6 +346,21 @@ export class VisaService {
         return await this.getById(id);
     }
 
+    static async setAppointmentDates(id: string, dates: string[]) {
+        const row = await this.getById(id);
+        const clean = [...new Set(dates.filter((date) => /^\d{4}-\d{2}-\d{2}$/.test(date)))].sort();
+        if (!clean.length) throw new Error("请至少留一个递签日期");
+        if (row.travel_date && row.travel_date <= clean[clean.length - 1]) {
+            throw new Error("递签日期需早于出行日期");
+        }
+
+        await visaOrderRepository.update(
+            { id: row.id },
+            { appointment_dates: clean, update_time: Date.now() },
+        );
+        return await this.getById(id);
+    }
+
     /** 后台传预约信：文件挂到订单上，状态同时走到已完成。 */
     static async attachFile(id: string, name: string, data: string) {
         const row = await this.getById(id);
