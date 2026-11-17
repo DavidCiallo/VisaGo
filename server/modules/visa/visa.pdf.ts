@@ -1,37 +1,36 @@
-/** 从预约信 PDF 里抠文字，再找出日期时间。只处理文本型 PDF，扫描件没有文字层。 */
+/** 从预约信 PDF 里抽文字（交给 pdfjs），再找出日期时间。扫描件没有文字层，认不出来。 */
 
-import { inflateSync } from "node:zlib";
+import { createRequire } from "node:module";
 
-function unescape(raw: string): string {
-    return raw
-        .replace(/\\([nrt])/g, (_all, ch) => (ch === "n" ? "\n" : ch === "r" ? "\r" : "\t"))
-        .replace(/\\([()\\])/g, "$1")
-        .replace(/\\([0-7]{1,3})/g, (_all, oct) => String.fromCharCode(parseInt(oct, 8)));
+const require = createRequire(import.meta.url);
+let loader: Promise<any> | null = null;
+
+/** pdfjs 是纯 JS 实现，Bun 下直接跑 legacy 构建，不需要 worker。 */
+function loadPdfjs(): Promise<any> {
+    loader ??= import(require.resolve("pdfjs-dist/legacy/build/pdf.mjs"));
+    return loader;
 }
 
-export function extractPdfText(buffer: Buffer): string {
-    const raw = buffer.toString("latin1");
+export async function extractPdfText(buffer: Buffer): Promise<string> {
+    const pdfjs = await loadPdfjs();
+    const task = pdfjs.getDocument({
+        data: new Uint8Array(buffer),
+        isEvalSupported: false,
+        useSystemFonts: false,
+        verbosity: 0,
+    });
+    const doc = await task.promise;
     const parts: string[] = [];
 
-    for (const match of raw.matchAll(/stream\r?\n([\s\S]*?)endstream/g)) {
-        const chunk = Buffer.from(match[1], "latin1");
-        let data = chunk;
-        try {
-            data = inflateSync(chunk);
-        } catch {
-            // 没压缩的流直接用
+    try {
+        for (let page = 1; page <= doc.numPages; page++) {
+            const content = await (await doc.getPage(page)).getTextContent();
+            for (const item of content.items) {
+                if (typeof item.str === "string" && item.str.trim()) parts.push(item.str);
+            }
         }
-        const content = data.toString("latin1");
-
-        for (const text of content.matchAll(/\((?:\\.|[^\\()])*\)/g)) {
-            parts.push(unescape(text[0].slice(1, -1)));
-        }
-        // 中文常见 UTF-16BE 十六进制串
-        for (const hex of content.matchAll(/<([0-9A-Fa-f\s]{4,})>/g)) {
-            const value = hex[1].replace(/\s+/g, "");
-            if (value.length % 4 !== 0) continue;
-            parts.push(Buffer.from(value, "hex").swap16().toString("utf16le"));
-        }
+    } finally {
+        await task.destroy();
     }
 
     return parts.join(" ").replace(/\s+/g, " ");
@@ -66,14 +65,14 @@ function to24(hour: number, meridiem?: string): number {
     return hour;
 }
 
-/** 常见写法都收：2026-12-08 09:30 / 08/12/2026 09:30 / 8 December 2026 09:30 / December 8, 2026 9:30 AM / 2026年12月8日 09:30。 */
+/** 常见写法都收：2026-12-08 09:30 / 08-12-2026 09:30 / 8 December 2026 09:30 / December 8, 2026 9:30 AM / 2026年12月8日 09:30。 */
 export function findDateTimes(text: string): string[] {
     const found = new Set<string>();
     const add = (stamp: string | null) => {
         if (stamp) found.add(stamp);
     };
 
-    // 2026-12-08 09:30、2026/12/08 09:30、2026.12.08、2026年12月8日 09:30
+    // 2026-12-08 09:30、2026/12/08、2026年12月8日 09:30
     for (const m of text.matchAll(
         /(\d{4})[-/.年]\s?(\d{1,2})[-/.月]\s?(\d{1,2})日?[^\d]{0,12}?(\d{1,2}):(\d{2})(?:\s*([AaPp][Mm]))?/g,
     )) {
@@ -88,7 +87,7 @@ export function findDateTimes(text: string): string[] {
         );
     }
 
-    // 08/12/2026 09:30（按日/月/年）
+    // 30-11-2026 10:30、08/12/2026 14:45（按日/月/年）
     for (const m of text.matchAll(
         /(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})[^\d]{0,12}?(\d{1,2}):(\d{2})(?:\s*([AaPp][Mm]))?/g,
     )) {

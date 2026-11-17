@@ -29,6 +29,7 @@
         "jsqr": "^1.4.0",
         "lucide-react": "^1.25.0",
         "nanoid": "^5.1.6",
+        "pdfjs-dist": "^6.5.438",
         "postcss": "^8.5.19",
         "react": "^19.1.2",
         "react-dom": "^19.1.3",

@@ -753,7 +753,8 @@ export class VisaService {
             if (!file.name.toLowerCase().endsWith(".pdf")) continue;
             try {
                 const buffer = fs.readFileSync(this.resolveUpload(file.id));
-                for (const stamp of findDateTimes(extractPdfText(buffer))) dates.add(stamp);
+                const text = await extractPdfText(buffer);
+                for (const stamp of findDateTimes(text)) dates.add(stamp);
             } catch {
                 // 读不出来就跳过这一份
             }

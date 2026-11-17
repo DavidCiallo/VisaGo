@@ -99,7 +99,6 @@ export function VisaOrdersPage() {
   const [photos, setPhotos] = useState<{ index: number; url: string }[]>([])
   const [settings, setSettings] = useState<VisaSettings | null>(null)
   const [fx, setFx] = useState<{ rate: number; date: string; source: string } | null>(null)
-  const [schedule, setSchedule] = useState("")
   const [candidates, setCandidates] = useState<string[]>([])
   const [picked, setPicked] = useState<string[]>([])
   const letterInput = useRef<HTMLInputElement>(null)
@@ -179,8 +178,8 @@ export function VisaOrdersPage() {
   function openOrder(order: VisaOrderDTO) {
     setSelected(order)
     setPositionDraft(order.position)
-    setSchedule(order.appointment_time ?? "")
     setCandidates([])
+    setPicked((order.appointment_time ?? "").split("、").filter(Boolean))
     setPicked([])
     setPhotos([])
     void loadPhotos(order.id)
@@ -272,29 +271,28 @@ export function VisaOrdersPage() {
     }
     const dates = res.data?.dates ?? []
     setCandidates(dates)
-    setPicked(dates.length === 1 ? dates : [])
     if (!dates.length) toast.error("预约信里没认出日期时间")
   }
 
-  async function saveSchedule() {
+  async function toggleStamp(stamp: string) {
     if (!selected) return
+    const next = picked.includes(stamp)
+      ? picked.filter((item) => item !== stamp)
+      : [...picked, stamp].sort()
+    setPicked(next)
+
     const res = await visaApi.orderSchedule({
       id: selected.id,
-      appointment_time: schedule,
+      appointment_time: next.join("、"),
       auth: getAuth(),
     })
     if (res.success && res.data?.order) {
       applyOrder(res.data.order)
-      toast.success("已保存")
       return
     }
+    setPicked(picked)
     toast.error(res.message || "保存失败")
   }
-
-  function applyPicked() {
-    setSchedule([...picked].sort().join("、"))
-  }
-
   const filtered = orders.filter((order) => {
     if (originFilter !== "all" && order.origin_code !== originFilter) return false
     if (countryFilter !== "all" && order.country_code !== countryFilter) return false
@@ -596,52 +594,41 @@ export function VisaOrdersPage() {
                   />
                   <Field label="备注" value={selected.appointment_note} />
                   <div className="grid gap-2">
-                    <span className="text-muted-foreground text-xs">预约时间</span>
                     <div className="flex flex-wrap items-center gap-2">
-                      <Input
-                        value={schedule}
-                        onChange={(event) => setSchedule(event.target.value)}
-                        placeholder="2027-01-05 09:30"
-                        className="h-8 w-64"
-                      />
-                      <Button size="sm" variant="outline" className="h-8" onClick={() => void saveSchedule()}>
-                        保存
-                      </Button>
-                      <Button size="sm" variant="outline" className="h-8" onClick={() => void parseDates()}>
+                      <span className="text-muted-foreground text-xs">预约时间</span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7"
+                        onClick={() => void parseDates()}
+                      >
                         从预约信识别
                       </Button>
                     </div>
-                    {candidates.length > 0 && (
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        {candidates.map((stamp) => {
-                          const on = picked.includes(stamp)
-                          return (
-                            <button
-                              key={stamp}
-                              type="button"
-                              onClick={() =>
-                                setPicked((current) =>
-                                  on ? current.filter((item) => item !== stamp) : [...current, stamp],
-                                )
-                              }
-                              className={cn(
-                                "rounded-full border px-2 py-0.5 text-xs transition",
-                                on
-                                  ? "border-brand bg-brand/10 text-brand"
-                                  : "text-muted-foreground hover:border-brand/40",
-                              )}
-                            >
-                              {stamp}
-                            </button>
-                          )
-                        })}
-                        <Button size="sm" className="h-6" disabled={!picked.length} onClick={applyPicked}>
-                          写入
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {picked.length === 0 && (
+                        <span className="text-muted-foreground text-xs">—</span>
+                      )}
+                      {[...new Set([...picked, ...candidates])].sort().map((stamp) => {
+                        const on = picked.includes(stamp)
+                        return (
+                          <button
+                            key={stamp}
+                            type="button"
+                            onClick={() => void toggleStamp(stamp)}
+                            className={cn(
+                              "rounded-full border px-2 py-0.5 text-xs transition",
+                              on
+                                ? "border-brand bg-brand/10 text-brand"
+                                : "text-muted-foreground hover:border-brand/40",
+                            )}
+                          >
+                            {stamp}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>                </div>
               </div>
 
               <div className="grid gap-1.5 rounded-md border p-3 text-sm">
