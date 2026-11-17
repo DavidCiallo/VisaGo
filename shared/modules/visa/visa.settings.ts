@@ -224,6 +224,11 @@ export function feeOf(origin: VisaOrigin | null | undefined): number {
     return Number.isFinite(value) && value > 0 ? value : 0;
 }
 
+/** 汇兑磨损按人民币收，非人民币出发地不并进原币报价，付款时再折过来加。 */
+export function quoteFeeOf(origin: VisaOrigin | null | undefined): number {
+    return origin && currencyOf(origin.code).code === "CNY" ? feeOf(origin) : 0;
+}
+
 export function findDestination(
     settings: VisaSettings,
     originCode: string,

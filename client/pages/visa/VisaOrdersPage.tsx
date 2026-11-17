@@ -47,6 +47,8 @@ function canArchive(order: VisaOrderDTO) {
   return !order.archived && order.status === "cancelled"
 }
 
+const PAGE_SIZE = 10
+
 function pad(value: number) {
   return String(value).padStart(2, "0")
 }
@@ -90,6 +92,7 @@ export function VisaOrdersPage() {
   const [originFilter, setOriginFilter] = useState("all")
   const [countryFilter, setCountryFilter] = useState("all")
   const [keyword, setKeyword] = useState("")
+  const [page, setPage] = useState(1)
   const [selected, setSelected] = useState<VisaOrderDTO | null>(null)
   const [positionDraft, setPositionDraft] = useState("")
   const [noteDraft, setNoteDraft] = useState("")
@@ -175,6 +178,10 @@ export function VisaOrdersPage() {
     void loadSettings()
     void loadFx()
   }, [])
+
+  useEffect(() => {
+    setPage(1)
+  }, [originFilter, countryFilter, keyword])
 
   function openOrder(order: VisaOrderDTO) {
     setSelected(order)
@@ -323,6 +330,10 @@ export function VisaOrdersPage() {
       .includes(text)
   })
 
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const currentPage = Math.min(page, pageCount)
+  const pageRows = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -371,9 +382,7 @@ export function VisaOrdersPage() {
                           updateFee(item.code, Number(event.target.value) || 0)
                         }
                       />
-                      <span className="text-muted-foreground text-xs">
-                        {currencyOf(item.code).symbol}
-                      </span>
+                      <span className="text-muted-foreground text-xs">人民币</span>
                     </div>
                   </label>
                 ))}
@@ -466,7 +475,7 @@ export function VisaOrdersPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((order) => (
+                {pageRows.map((order) => (
                   <TableRow
                     key={order.id}
                     className="cursor-pointer"
@@ -505,6 +514,31 @@ export function VisaOrdersPage() {
                 ))}
               </TableBody>
             </Table>
+          )}
+          {pageCount > 1 && (
+            <div className="mt-3 flex items-center justify-end gap-2 text-xs">
+              <span className="text-muted-foreground">
+                第 {currentPage} / {pageCount} 页
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7"
+                disabled={currentPage <= 1}
+                onClick={() => setPage(currentPage - 1)}
+              >
+                上一页
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7"
+                disabled={currentPage >= pageCount}
+                onClick={() => setPage(currentPage + 1)}
+              >
+                下一页
+              </Button>
+            </div>
           )}
         </CardContent>
       </Card>

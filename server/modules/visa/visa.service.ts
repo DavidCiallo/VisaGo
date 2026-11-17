@@ -13,6 +13,7 @@ import {
     buildDefaultSettings,
     currencyOf,
     feeOf,
+    quoteFeeOf,
     findDestination,
     findOrigin,
     materialsPlan,
@@ -614,7 +615,7 @@ export class VisaService {
             req.travelers,
             req.flight,
             req.hotel,
-            feeOf(findOrigin(settings, req.origin_code)),
+            quoteFeeOf(findOrigin(settings, req.origin_code)),
         );
 
         return await visaOrderRepository.insert({
@@ -699,7 +700,7 @@ export class VisaService {
             order.travelers,
             req.flight,
             req.hotel,
-            feeOf(findOrigin(settings, order.origin_code)),
+            quoteFeeOf(findOrigin(settings, order.origin_code)),
         );
         await visaOrderRepository.update(
             { id: order.id },
@@ -746,7 +747,11 @@ export class VisaService {
         if (currency === "GBP") {
             const rate = (await gbpToCny())?.rate ?? 0;
             if (rate > 0) {
-                return await this.findPayCode(Math.round(order.total * rate), "CNY");
+                const settings = await this.getSettings();
+                const fee = Math.round(
+                    feeOf(findOrigin(settings, order.origin_code)) * order.travelers,
+                );
+                return await this.findPayCode(Math.round(order.total * rate) + fee, "CNY");
             }
         }
         return await this.findPayCode(order.total, currency);
@@ -854,7 +859,7 @@ export class VisaService {
             travelers,
             order.flight,
             order.hotel,
-            feeOf(findOrigin(settings, order.origin_code)),
+            quoteFeeOf(findOrigin(settings, order.origin_code)),
         );
 
         await visaOrderRepository.update(
@@ -892,7 +897,7 @@ export class VisaService {
             travelers,
             order.flight,
             order.hotel,
-            feeOf(findOrigin(settings, order.origin_code)),
+            quoteFeeOf(findOrigin(settings, order.origin_code)),
         );
 
         await visaOrderRepository.update(

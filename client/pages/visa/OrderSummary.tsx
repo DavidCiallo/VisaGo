@@ -8,7 +8,7 @@ import {
   type VisaCountry,
   type VisaSlotSupport,
 } from "@/shared/modules/visa/visa.catalog"
-import { currencyOf, feeOf, type VisaOrigin } from "@/shared/modules/visa/visa.settings"
+import { currencyOf, quoteFeeOf, type VisaOrigin } from "@/shared/modules/visa/visa.settings"
 
 export function prettyDate(date: string) {
   const text = date.trim()
@@ -54,7 +54,7 @@ export function OrderSummary({
   tripDays: number
   slotSupport: VisaSlotSupport
 }) {
-  const quote = quoteVisa(visaPrice, travelers, flight, hotel, feeOf(origin))
+  const quote = quoteVisa(visaPrice, travelers, flight, hotel, quoteFeeOf(origin))
   const symbol = currencyOf(origin?.code ?? "CN").symbol
   const perTraveler = travelers > 1 ? ` × ${travelers}` : ""
   const dates = [...appointmentDates].sort()
