@@ -264,11 +264,6 @@ export interface VisaLetterDatesResponse {
     message?: string;
 }
 
-export interface VisaOrderScheduleInput {
-    id: string;
-    appointment_time: string;
-    auth?: string;
-}
 
 export interface VisaNotifyTestResponse {
     success: boolean;

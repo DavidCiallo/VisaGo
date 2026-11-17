@@ -179,8 +179,6 @@ export function VisaOrdersPage() {
     setSelected(order)
     setPositionDraft(order.position)
     setCandidates([])
-    setPicked((order.appointment_time ?? "").split("、").filter(Boolean))
-    setPicked([])
     setPhotos([])
     void loadPhotos(order.id)
   }
@@ -274,24 +272,17 @@ export function VisaOrdersPage() {
     if (!dates.length) toast.error("预约信里没认出日期时间")
   }
 
-  async function toggleStamp(stamp: string) {
-    if (!selected) return
-    const next = picked.includes(stamp)
-      ? picked.filter((item) => item !== stamp)
-      : [...picked, stamp].sort()
-    setPicked(next)
-
-    const res = await visaApi.orderSchedule({
-      id: selected.id,
-      appointment_time: next.join("、"),
-      auth: getAuth(),
+  function toggleStamp(stamp: string) {
+    setPositionDraft((current) => {
+      if (current.includes(stamp)) {
+        return current
+          .replace(stamp, "")
+          .replace(/\s*·\s*·\s*/g, " · ")
+          .replace(/^\s*·\s*|\s*·\s*$/g, "")
+          .trim()
+      }
+      return current.trim() ? `${current.trim()} · ${stamp}` : stamp
     })
-    if (res.success && res.data?.order) {
-      applyOrder(res.data.order)
-      return
-    }
-    setPicked(picked)
-    toast.error(res.message || "保存失败")
   }
   const filtered = orders.filter((order) => {
     if (originFilter !== "all" && order.origin_code !== originFilter) return false
@@ -593,42 +584,7 @@ export function VisaOrdersPage() {
                     value={selected.appointment_dates.map((iso) => formatDay(iso)).join("、")}
                   />
                   <Field label="备注" value={selected.appointment_note} />
-                  <div className="grid gap-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-muted-foreground text-xs">预约时间</span>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-7"
-                        onClick={() => void parseDates()}
-                      >
-                        从预约信识别
-                      </Button>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      {picked.length === 0 && (
-                        <span className="text-muted-foreground text-xs">—</span>
-                      )}
-                      {[...new Set([...picked, ...candidates])].sort().map((stamp) => {
-                        const on = picked.includes(stamp)
-                        return (
-                          <button
-                            key={stamp}
-                            type="button"
-                            onClick={() => void toggleStamp(stamp)}
-                            className={cn(
-                              "rounded-full border px-2 py-0.5 text-xs transition",
-                              on
-                                ? "border-brand bg-brand/10 text-brand"
-                                : "text-muted-foreground hover:border-brand/40",
-                            )}
-                          >
-                            {stamp}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>                </div>
+                </div>
               </div>
 
               <div className="grid gap-1.5 rounded-md border p-3 text-sm">
@@ -711,16 +667,42 @@ export function VisaOrdersPage() {
                 <div className="space-y-3 border-t pt-3">
                   <div className="grid gap-1.5">
                     <span className="text-muted-foreground text-xs">预约到的位置</span>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <Input
                         value={positionDraft}
                         onChange={(event) => setPositionDraft(event.target.value)}
                         placeholder="例如：北京签证中心 3 号窗口 · 2027-01-05 上午"
+                        className="min-w-64 flex-1"
                       />
                       <Button size="sm" variant="outline" onClick={savePosition}>
                         保存
                       </Button>
+                      <Button size="sm" variant="outline" onClick={() => void parseDates()}>
+                        从预约信识别
+                      </Button>
                     </div>
+                    {candidates.length > 0 && (
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {candidates.map((stamp) => {
+                          const on = positionDraft.includes(stamp)
+                          return (
+                            <button
+                              key={stamp}
+                              type="button"
+                              onClick={() => toggleStamp(stamp)}
+                              className={cn(
+                                "rounded-full border px-2 py-0.5 text-xs transition",
+                                on
+                                  ? "border-brand bg-brand/10 text-brand"
+                                  : "text-muted-foreground hover:border-brand/40",
+                              )}
+                            >
+                              {stamp}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid gap-1.5">

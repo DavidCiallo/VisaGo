@@ -47,8 +47,6 @@ export interface VisaOrderEntity {
     appointment_city: string;
     appointment_dates: string[];
     appointment_note: string;
-    /** 实际约到的时间，可能多条，格式 yyyy-mm-dd hh:mm */
-    appointment_time: string;
     travel_date: string;
     trip_days: number;
     slot_support: string;
@@ -89,7 +87,6 @@ export class VisaOrderDTO {
     public appointment_city: string;
     public appointment_dates: string[];
     public appointment_note: string;
-    public appointment_time: string;
     public travel_date: string;
     public trip_days: number;
     public slot_support: VisaSlotSupport;
@@ -124,7 +121,6 @@ export class VisaOrderDTO {
         this.appointment_city = origin.appointment_city;
         this.appointment_dates = origin.appointment_dates;
         this.appointment_note = origin.appointment_note;
-        this.appointment_time = origin.appointment_time ?? "";
         this.travel_date = origin.travel_date;
         this.trip_days = origin.trip_days;
         this.slot_support = normalizeSlotSupport(origin.slot_support);

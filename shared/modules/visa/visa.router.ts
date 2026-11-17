@@ -49,7 +49,6 @@ import {
     VisaNotifyTestResponse,
     VisaLetterDatesInput,
     VisaLetterDatesResponse,
-    VisaOrderScheduleInput,
 } from "./visa.interface";
 
 export const visaRoutes = {
@@ -69,11 +68,6 @@ export const visaRoutes = {
         path: "/letter-dates",
         request: {} as VisaLetterDatesInput,
         response: {} as VisaLetterDatesResponse,
-    },
-    orderSchedule: {
-        path: "/order-schedule",
-        request: {} as VisaOrderScheduleInput,
-        response: {} as VisaOrderResponse,
     },
     notifyTest: {
         path: "/notify-test",

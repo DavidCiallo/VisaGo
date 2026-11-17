@@ -763,14 +763,6 @@ export class VisaService {
         return [...dates].sort();
     }
 
-    static async setAppointmentTime(id: string, value: string) {
-        const row = await this.getById(id);
-        await visaOrderRepository.update(
-            { id: row.id },
-            { appointment_time: String(value ?? "").slice(0, 120), update_time: Date.now() },
-        );
-        return await this.getById(id);
-    }
 
     /** 后台点一下，看配置到底通不通。 */
     static async notifyTest() {
