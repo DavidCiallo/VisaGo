@@ -92,6 +92,7 @@ export function VisaOrdersPage() {
   const [keyword, setKeyword] = useState("")
   const [selected, setSelected] = useState<VisaOrderDTO | null>(null)
   const [positionDraft, setPositionDraft] = useState("")
+  const [noteDraft, setNoteDraft] = useState("")
   const [attaching, setAttaching] = useState(false)
   const [archived, setArchived] = useState<VisaOrderDTO[]>([])
   const [archiveOpen, setArchiveOpen] = useState(false)
@@ -178,6 +179,7 @@ export function VisaOrdersPage() {
   function openOrder(order: VisaOrderDTO) {
     setSelected(order)
     setPositionDraft(order.position)
+    setNoteDraft(order.appointment_note)
     setCandidates([])
     setPhotos([])
     void loadPhotos(order.id)
@@ -214,6 +216,21 @@ export function VisaOrdersPage() {
     if (res.success && res.data?.order) {
       applyOrder(res.data.order)
       toast.success("已保存预约位置")
+      return
+    }
+    toast.error(res.message || "保存失败")
+  }
+
+  async function saveNote() {
+    if (!selected) return
+    const res = await visaApi.orderNote({
+      id: selected.id,
+      appointment_note: noteDraft,
+      auth: getAuth(),
+    })
+    if (res.success && res.data?.order) {
+      applyOrder(res.data.order)
+      toast.success("已保存")
       return
     }
     toast.error(res.message || "保存失败")
@@ -460,15 +477,9 @@ export function VisaOrdersPage() {
                     </TableCell>
                     <TableCell>
                       <span className="font-medium">{order.customer_name || "—"}</span>
-                      <span className="text-muted-foreground ml-2 text-xs">
-                        {order.customer_phone}
-                      </span>
                     </TableCell>
                     <TableCell>
                       <span className="font-medium">{order.country_name}</span>
-                      <span className="text-muted-foreground ml-2 text-xs">
-                        {order.visa} · {order.origin_label}出发
-                      </span>
                     </TableCell>
                     <TableCell>{order.travelers}</TableCell>
                     <TableCell>
@@ -590,7 +601,19 @@ export function VisaOrdersPage() {
                     label="候选日期"
                     value={selected.appointment_dates.map((iso) => formatDay(iso)).join("、")}
                   />
-                  <Field label="备注" value={selected.appointment_note} />
+                  <div className="grid gap-1.5">
+                    <span className="text-muted-foreground text-xs">备注</span>
+                    <div className="flex gap-2">
+                      <Input
+                        value={noteDraft}
+                        onChange={(event) => setNoteDraft(event.target.value)}
+                        placeholder="给客户的备注"
+                      />
+                      <Button size="sm" variant="outline" onClick={() => void saveNote()}>
+                        保存
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
 

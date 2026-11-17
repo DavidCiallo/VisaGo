@@ -24,6 +24,7 @@ import {
     VisaOcrInput,
     VisaOrderAttachInput,
     VisaOrderPositionInput,
+    VisaOrderNoteInput,
     VisaOrderSetStatusInput,
     VisaOrderArchiveInput,
     VisaPayCodeListInput,
@@ -196,6 +197,16 @@ async function orderPosition(request: VisaOrderPositionInput) {
     return { order: await toDTO(row) };
 }
 
+async function orderNote(request: VisaOrderNoteInput) {
+    requireLogin(request);
+    const row = await VisaService.setNote(
+        String(request?.id ?? ""),
+        String(request?.appointment_note ?? ""),
+    );
+
+    return { order: await toDTO(row) };
+}
+
 async function orderAttach(request: VisaOrderAttachInput) {
     requireLogin(request);
     const row = await VisaService.attachFile(
@@ -350,6 +361,7 @@ export const visaMount = {
         orderArchive,
         orderRestore,
         orderPosition,
+        orderNote,
         orderAttach,
         payCodeList,
         payCodeSave,

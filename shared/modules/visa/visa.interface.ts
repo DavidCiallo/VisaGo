@@ -408,6 +408,12 @@ export interface VisaOrderPositionInput {
     auth?: string;
 }
 
+export interface VisaOrderNoteInput {
+    id: string;
+    appointment_note: string;
+    auth?: string;
+}
+
 export interface VisaOrderAttachInput {
     id: string;
     name: string;

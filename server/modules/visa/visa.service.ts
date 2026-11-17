@@ -336,6 +336,15 @@ export class VisaService {
         return await this.getById(id);
     }
 
+    static async setNote(id: string, note: string) {
+        const row = await this.getById(id);
+        await visaOrderRepository.update(
+            { id: row.id },
+            { appointment_note: String(note ?? "").trim().slice(0, 300), update_time: Date.now() },
+        );
+        return await this.getById(id);
+    }
+
     /** 后台传预约信：文件挂到订单上，状态同时走到已完成。 */
     static async attachFile(id: string, name: string, data: string) {
         const row = await this.getById(id);

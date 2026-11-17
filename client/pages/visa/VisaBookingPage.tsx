@@ -881,7 +881,7 @@ function BookingSuccess({ order, payCode }: { order: VisaOrderDTO; payCode: Visa
         </span>
       </div>
 
-      <h1 className="mt-6 text-3xl font-extrabold tracking-tight text-ink">预订成功！</h1>
+      <h1 className="mt-6 text-3xl font-extrabold tracking-tight text-ink">登记成功！</h1>
       <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-ink-soft">
         前往{order.country_name}的申请已保存，签证专员将核对材料并预约递签。
       </p>
