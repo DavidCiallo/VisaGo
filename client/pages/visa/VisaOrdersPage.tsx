@@ -601,18 +601,17 @@ export function VisaOrdersPage() {
                     label="候选日期"
                     value={selected.appointment_dates.map((iso) => formatDay(iso)).join("、")}
                   />
-                  <div className="grid gap-1.5">
+                  <div className="flex items-center gap-2">
                     <span className="text-muted-foreground text-xs">备注</span>
-                    <div className="flex gap-2">
-                      <Input
-                        value={noteDraft}
-                        onChange={(event) => setNoteDraft(event.target.value)}
-                        placeholder="给客户的备注"
-                      />
-                      <Button size="sm" variant="outline" onClick={() => void saveNote()}>
-                        保存
-                      </Button>
-                    </div>
+                    <Input
+                      value={noteDraft}
+                      onChange={(event) => setNoteDraft(event.target.value)}
+                      placeholder="给客户的备注"
+                      className="h-8 flex-1"
+                    />
+                    <Button size="sm" variant="outline" className="h-8" onClick={() => void saveNote()}>
+                      保存
+                    </Button>
                   </div>
                 </div>
               </div>
