@@ -438,6 +438,7 @@ export function VisaOrdersPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>下单时间</TableHead>
+                  <TableHead>客户</TableHead>
                   <TableHead>目的地</TableHead>
                   <TableHead>人数</TableHead>
                   <TableHead>递签</TableHead>
@@ -456,6 +457,12 @@ export function VisaOrdersPage() {
                   >
                     <TableCell className="text-muted-foreground whitespace-nowrap text-xs">
                       {formatTime(order.create_time)}
+                    </TableCell>
+                    <TableCell>
+                      <span className="font-medium">{order.customer_name || "—"}</span>
+                      <span className="text-muted-foreground ml-2 text-xs">
+                        {order.customer_phone}
+                      </span>
                     </TableCell>
                     <TableCell>
                       <span className="font-medium">{order.country_name}</span>
