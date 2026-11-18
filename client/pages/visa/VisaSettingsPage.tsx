@@ -22,6 +22,7 @@ import {
   type VisaSettings,
 } from "@/shared/modules/visa/visa.settings"
 import { parseCalendarScreenshot, type CalendarWord, type ScannedDay } from "./calendarScan"
+import type { VisaVfsResult } from "@/shared/modules/visa/visa.interface"
 
 function readAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -298,6 +299,18 @@ export function VisaSettingsPage() {
       cautionDates: [...activeCenter.cautionDates],
     }
 
+    patchCenter(countryCode, index, merged)
+    setUndoStep(snapshot)
+    toast.success(
+      `可选 +${merged.stats.available}、不建议 +${merged.stats.caution}、清掉 ${merged.stats.cleared}`,
+    )
+  }
+
+  function patchCenter(
+    countryCode: string,
+    index: number,
+    next: { dates: string[]; cautionDates: string[] },
+  ) {
     setSettings((current) => {
       if (!current) return current
       return {
@@ -314,7 +327,7 @@ export function VisaSettingsPage() {
                 ...destination,
                 centers: destination.centers.map((center, position) =>
                   position === index
-                    ? { ...center, dates: merged.dates, cautionDates: merged.cautionDates }
+                    ? { ...center, dates: next.dates, cautionDates: next.cautionDates }
                     : center,
                 ),
               },
@@ -323,11 +336,32 @@ export function VisaSettingsPage() {
         }),
       }
     })
+  }
 
-    setUndoStep(snapshot)
-    toast.success(
-      `可选 +${merged.stats.available}、不建议 +${merged.stats.caution}、清掉 ${merged.stats.cleared}`,
-    )
+  function applyVfs(vfs: VisaVfsResult) {
+    const destination = settings?.origins.find((item) => item.code === originCode)?.destinations[vfs.country_code]
+    const index = destination?.centers.findIndex((item) => item.name === vfs.city) ?? -1
+    if (!destination || index < 0) {
+      toast.error(`配置里没有 ${vfs.city}`)
+      return
+    }
+
+    const center = destination.centers[index]
+    const months = new Set(vfs.months)
+    const keep = (list: string[]) => list.filter((iso) => !months.has(iso.slice(0, 7)))
+    const merged = {
+      dates: [...keep(center.dates), ...vfs.dates].sort(),
+      cautionDates: [...keep(center.cautionDates), ...vfs.cautionDates].sort(),
+    }
+
+    patchCenter(vfs.country_code, index, merged)
+    setUndoStep({
+      countryCode: vfs.country_code,
+      index,
+      dates: [...center.dates],
+      cautionDates: [...center.cautionDates],
+    })
+    toast.success(`${vfs.city}：可选 ${vfs.dates.length} 天、不建议 ${vfs.cautionDates.length} 天`)
   }
 
   function undoScan() {
@@ -390,8 +424,24 @@ export function VisaSettingsPage() {
     }
   }
 
+  async function scanVfs(text: string) {
+    const res = await visaApi.vfsScan({ text, auth: getAuth() })
+    if (!res.success || !res.data?.vfs) {
+      toast.error(res.message || "没认出 VFS 排期")
+      return
+    }
+    applyVfs(res.data.vfs)
+  }
+
   useEffect(() => {
     async function onPaste(event: ClipboardEvent) {
+      const text = event.clipboardData?.getData("text/plain") ?? ""
+      if (text.includes('"calendars"')) {
+        event.preventDefault()
+        await scanVfs(text)
+        return
+      }
+
       const items = Array.from(event.clipboardData?.items ?? [])
       const file = items.find((item) => item.type.startsWith("image/"))?.getAsFile()
       if (!file || !activeCenter) return

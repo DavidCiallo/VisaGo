@@ -352,6 +352,29 @@ export interface VisaCalendarScanResponse {
     message?: string;
 }
 
+export interface VisaVfsInput {
+    /** VFS 排期接口返回的 JSON，整段贴进来即可 */
+    text: string;
+    auth?: string;
+}
+
+export interface VisaVfsResult {
+    country_code: string;
+    city: string;
+    /** 这份数据覆盖的月份，如 "2026-11" */
+    months: string[];
+    /** ≥5 个位置 */
+    dates: string[];
+    /** 2-4 个位置 */
+    cautionDates: string[];
+}
+
+export interface VisaVfsResponse {
+    success: boolean;
+    data?: { vfs: VisaVfsResult };
+    message?: string;
+}
+
 export interface VisaPayCodeReorderInput {
     /** 按新顺序排好的收款码 id */
     ids: string[];

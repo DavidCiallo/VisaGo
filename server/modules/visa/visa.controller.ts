@@ -4,6 +4,7 @@ import {
     toPassportDetails,
     VisaAddTravelerInput,
     VisaCalendarScanInput,
+    VisaVfsInput,
     VisaCreateInput,
     VisaCreateRequest,
     VisaExportInput,
@@ -40,6 +41,7 @@ import { visaRoutes } from "../../../shared/modules/visa/visa.router";
 import { getIdentifyByVerify } from "../auth/auth.service";
 import { VisaService } from "./visa.service";
 import { ocrConfigured, recognizePassport } from "./visa.ocr";
+import { parseVfs } from "./visa.vfs";
 import { gbpToCny } from "./visa.fx";
 
 /** 后台接口：请求里必须带有效的登录 token。 */
@@ -254,6 +256,12 @@ async function calendarScan(request: VisaCalendarScanInput) {
     return await VisaService.scanCalendar(String(request?.image ?? ""));
 }
 
+async function vfsScan(request: VisaVfsInput) {
+    requireLogin(request);
+
+    return { vfs: parseVfs(String(request?.text ?? "")) };
+}
+
 async function payCodeRemove(request: VisaPayCodeRemoveInput) {
     requireLogin(request);
 
@@ -381,6 +389,7 @@ export const visaMount = {
         payCodeScan,
         payCodeReorder,
         calendarScan,
+        vfsScan,
         file,
         passportScan,
         addTraveler,

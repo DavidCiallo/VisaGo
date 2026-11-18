@@ -23,6 +23,8 @@ import {
     VisaOrderArchiveInput,
     VisaCalendarScanInput,
     VisaCalendarScanResponse,
+    VisaVfsInput,
+    VisaVfsResponse,
     VisaPayCodeListInput,
     VisaPayCodeListResponse,
     VisaPayCodeRemoveInput,
@@ -190,6 +192,11 @@ export const visaRoutes = {
         path: "/calendar-scan",
         request: {} as VisaCalendarScanInput,
         response: {} as VisaCalendarScanResponse,
+    },
+    vfsScan: {
+        path: "/vfs-scan",
+        request: {} as VisaVfsInput,
+        response: {} as VisaVfsResponse,
     },
     orderSetStatus: {
         path: "/order-set-status",
