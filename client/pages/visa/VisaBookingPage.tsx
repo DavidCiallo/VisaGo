@@ -117,7 +117,7 @@ export function VisaBookingPage() {
   const [order, setOrder] = useState<VisaOrderDTO | null>(null)
   const [payCode, setPayCode] = useState<VisaPayCode | null>(null)
   const restored = useRef(false)
-  /** 从首页「开始申请」进来是要开新单，自动核验完直接进流程 */
+  /** 从首页「开始申请」进来，上一次的草稿已经作废，核验不必等草稿 */
   const wantsNew = useRef(searchParams.get("new") !== null)
 
   const country = findCountry(countryCode)
@@ -240,7 +240,6 @@ export function VisaBookingPage() {
       }
       setVerified(true)
       setHistory(res.data.orders ?? [])
-      if (wantsNew.current) setEntering(true)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
