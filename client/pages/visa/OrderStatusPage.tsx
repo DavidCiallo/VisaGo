@@ -56,6 +56,7 @@ export function OrderStatusPage() {
   } | null>(null)
   // 刚下单那次展开收款码，之后再进默认收起
   const [payOpen, setPayOpen] = useState(false)
+  const [passportOpen, setPassportOpen] = useState(false)
   const [error, setError] = useState("")
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -510,9 +511,18 @@ export function OrderStatusPage() {
         <div className="mt-4 rounded-[28px] border border-line bg-paper-2 p-5 shadow-[0_18px_40px_-32px_rgba(88,61,43,0.55)]">
           <div className="flex items-baseline justify-between gap-2">
             <p className="text-sm font-bold text-ink">护照信息</p>
-            <p className="text-xs text-ink-soft">
-              {filled}/{order.travelers} 已填写
-            </p>
+            <div className="flex items-center gap-3">
+              <p className="text-xs text-ink-soft">
+                {filled}/{order.travelers} 已填写
+              </p>
+              <button
+                type="button"
+                onClick={() => setPassportOpen((open) => !open)}
+                className="shrink-0 text-xs font-semibold text-brand"
+              >
+                {passportOpen ? "收起" : "展开"}
+              </button>
+            </div>
           </div>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#eedfcc]">
             <div
@@ -520,7 +530,7 @@ export function OrderStatusPage() {
               style={{ width: `${(filled / order.travelers) * 100}%` }}
             />
           </div>
-          <div className="mt-3 flex flex-col gap-2">
+          <div className={cn("mt-3 flex flex-col gap-2", !passportOpen && "hidden")}>
             {order.passports.map((item, index) => {
               const done = Boolean(item.first_name.trim() && item.last_name.trim())
               const removable = !locked && order.travelers > 1
@@ -563,9 +573,16 @@ export function OrderStatusPage() {
           </div>
 
           {locked ? (
-            <p className="mt-3 text-xs text-ink-soft">订单已锁定，无法重新上传护照。</p>
+            <p className={cn("mt-3 text-xs text-ink-soft", !passportOpen && "hidden")}>
+              订单已锁定，无法重新上传护照。
+            </p>
           ) : (
-            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+            <div
+              className={cn(
+                "mt-3 flex flex-wrap items-center gap-2 text-xs",
+                !passportOpen && "hidden",
+              )}
+            >
               <span className="text-ink-soft">
                 {uploading ? "正在识别…" : "点击任意出行人，可修改或重新上传护照。"}
               </span>
@@ -589,7 +606,7 @@ export function OrderStatusPage() {
             onChange={uploadPhoto}
           />
 
-          <div className="mt-3 space-y-2">
+          <div className={cn("mt-3 space-y-2", !passportOpen && "hidden")}>
             {order.passports.map((item, index) => {
               if (!(item.first_name.trim() && item.last_name.trim())) return null
               const rows: [string, string][] = [
@@ -625,23 +642,30 @@ export function OrderStatusPage() {
             })}
           </div>
 
-          <div className="mt-4 border-t border-line pt-4">
-            <p className="text-xs text-ink-soft">发送链接给同行人，对方可直接补交护照信息。</p>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <input
-                readOnly
-                value={inviteUrl}
-                className="min-w-0 flex-1 rounded-full border border-line bg-paper-3/60 px-4 py-2 text-xs text-ink"
-              />
-              <button
-                type="button"
-                onClick={copyInvite}
-                className="shrink-0 rounded-full bg-brand px-4 py-2 text-xs font-semibold text-[#fff8f1] transition hover:bg-brand-deep"
-              >
-                复制链接
-              </button>
+          {!locked && (
+            <div
+              className={cn(
+                "mt-4 border-t border-line pt-4",
+                !passportOpen && "hidden",
+              )}
+            >
+              <p className="text-xs text-ink-soft">发送链接给同行人，对方可直接补交护照信息。</p>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <input
+                  readOnly
+                  value={inviteUrl}
+                  className="min-w-0 flex-1 rounded-full border border-line bg-paper-3/60 px-4 py-2 text-xs text-ink"
+                />
+                <button
+                  type="button"
+                  onClick={copyInvite}
+                  className="shrink-0 rounded-full bg-brand px-4 py-2 text-xs font-semibold text-[#fff8f1] transition hover:bg-brand-deep"
+                >
+                  复制链接
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {order.status !== "new" && (
