@@ -117,6 +117,8 @@ export function VisaBookingPage() {
   const [order, setOrder] = useState<VisaOrderDTO | null>(null)
   const [payCode, setPayCode] = useState<VisaPayCode | null>(null)
   const restored = useRef(false)
+  /** 从首页「开始申请」进来是要开新单，自动核验完直接进流程 */
+  const wantsNew = useRef(searchParams.get("new") !== null)
 
   const country = findCountry(countryCode)
   const origin = settings ? findOrigin(settings, originCode) : null
@@ -201,6 +203,44 @@ export function VisaBookingPage() {
       setVerified(true)
       setHistory(res.data.orders ?? [])
       setEntering(false)
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // 本机记着上次核验过的身份，直接用，省得再填一次邮箱和姓名
+  useEffect(() => {
+    if (searchParams.get("list")) return
+    if (!wantsNew.current && localStorage.getItem(DRAFT_KEY)) return
+
+    const raw = localStorage.getItem("visa_owner")
+    if (!raw) return
+
+    let parsed: { email?: string; name?: string }
+    try {
+      parsed = JSON.parse(raw)
+    } catch {
+      return
+    }
+    const ownerEmail = (parsed.email ?? "").trim()
+    const ownerName = (parsed.name ?? "").trim()
+    if (!ownerEmail || !ownerName) return
+
+    setEmail(ownerEmail)
+    setCustomerName(ownerName)
+    setPhase("name")
+
+    void (async () => {
+      const res = await visaApi.identify({ email: ownerEmail, name: ownerName })
+      if (!(res.success && res.data?.ok)) {
+        setPhase("email")
+        return
+      }
+      for (const item of res.data.keys ?? []) {
+        if (item.key) localStorage.setItem(`visa_order_key_${item.token}`, item.key)
+      }
+      setVerified(true)
+      setHistory(res.data.orders ?? [])
+      if (wantsNew.current) setEntering(true)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
