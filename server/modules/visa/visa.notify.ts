@@ -1,4 +1,4 @@
-/** QQ 通知：直接 POST qqbridge 的 /send，配置来自后台设置，缺项就当没配。 */
+/** 通知：直接 POST 机器人网关的 /send（wecombridge 之类的接口），配置来自后台设置，缺项就当没配。 */
 
 import type { VisaSettings } from "../../../shared/modules/visa/visa.settings";
 
@@ -12,7 +12,8 @@ function config(settings: VisaSettings | null | undefined) {
     const url = String(notify?.qq_url ?? "").trim().replace(/\/+$/, "");
     const target = String(notify?.qq_target ?? "").trim();
     const token = String(notify?.qq_token ?? "").trim();
-    return { url, target, token };
+    const type = ["single", "group"].includes(String(notify?.qq_type ?? "")) ? String(notify?.qq_type) : "";
+    return { url, target, token, type };
 }
 
 export function notifyConfigured(settings: VisaSettings | null | undefined): boolean {
@@ -24,7 +25,7 @@ export async function sendQQ(
     settings: VisaSettings | null | undefined,
     content: string,
 ): Promise<NotifyResult> {
-    const { url, target, token } = config(settings);
+    const { url, target, token, type } = config(settings);
     if (!url || !target) return { ok: false, error: "还没配置通知" };
 
     try {
@@ -34,7 +35,7 @@ export async function sendQQ(
                 "Content-Type": "application/json; charset=utf-8",
                 ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
-            body: JSON.stringify({ target_id: target, content }),
+            body: JSON.stringify({ target_id: target, content, ...(type ? { target_type: type } : {}) }),
             signal: AbortSignal.timeout(35000),
         });
         if (!res.ok) {

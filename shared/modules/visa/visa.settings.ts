@@ -65,12 +65,14 @@ export interface VisaSettings {
 }
 
 export interface VisaNotify {
-    /** qqbridge 地址，例如 http://127.0.0.1:18080 */
+    /** 机器人网关地址，例如 http://8.133.217.12:8989 */
     qq_url: string;
     /** 访问令牌，可留空 */
     qq_token: string;
-    /** 默认会话 ID */
+    /** 默认会话 ID：单聊 userid 或群聊 chatid */
     qq_target: string;
+    /** 会话类型 single / group，留空由机器人按记下的推断 */
+    qq_type?: string;
 }
 
 export function notifyOf(settings: VisaSettings | null | undefined): VisaNotify {
@@ -78,6 +80,7 @@ export function notifyOf(settings: VisaSettings | null | undefined): VisaNotify 
         qq_url: String(settings?.notify?.qq_url ?? "").trim(),
         qq_token: String(settings?.notify?.qq_token ?? "").trim(),
         qq_target: String(settings?.notify?.qq_target ?? "").trim(),
+        qq_type: String(settings?.notify?.qq_type ?? "").trim(),
     };
 }
 
@@ -191,7 +194,7 @@ function buildCenters(origin: VisaOriginCode, country: string, names: string[]):
 export function buildDefaultSettings(): VisaSettings {
     return {
         materials: DEFAULT_MATERIALS,
-        notify: { qq_url: "", qq_token: "", qq_target: "" },
+        notify: { qq_url: "", qq_token: "", qq_target: "", qq_type: "" },
         origins: (["CN", "UK"] as VisaOriginCode[]).map((code) => ({
             code,
             label: VISA_ORIGIN_LABELS[code],

@@ -1,4 +1,4 @@
-import { useRef, useState, type ChangeEvent } from "react"
+import { useEffect, useRef, useState, type ChangeEvent } from "react"
 import { Download, Moon, Sun, Monitor, Upload } from "lucide-react"
 
 import {
@@ -25,6 +25,11 @@ import { toast } from "@/client/methods/notify"
 import { visaApi } from "@/client/api/instance"
 import { getAuth } from "@/client/methods/auth"
 import type { VisaBackup } from "@/shared/modules/visa/visa.interface"
+import {
+  notifyOf,
+  type VisaNotify,
+  type VisaSettings,
+} from "@/shared/modules/visa/visa.settings"
 
 export function SettingsPage() {
   const { theme, setTheme } = useTheme()
@@ -33,6 +38,39 @@ export function SettingsPage() {
   const fileRef = useRef<HTMLInputElement>(null)
   const [pending, setPending] = useState<VisaBackup | null>(null)
   const [importing, setImporting] = useState(false)
+  const [settings, setSettings] = useState<VisaSettings | null>(null)
+  const [notify, setNotify] = useState<VisaNotify | null>(null)
+
+  useEffect(() => {
+    void (async () => {
+      const res = await visaApi.settings({})
+      if (!res.success || !res.data?.settings) return
+      setSettings(res.data.settings)
+      setNotify(notifyOf(res.data.settings))
+    })()
+  }, [])
+
+  async function saveNotify() {
+    if (!settings || !notify) return
+    const res = await visaApi.saveSettings({
+      settings: { ...settings, notify },
+      auth: getAuth(),
+    })
+    if (!res.success || !res.data?.settings) {
+      toast.error(res.message || "保存失败")
+      return
+    }
+    setSettings(res.data.settings)
+    setNotify(notifyOf(res.data.settings))
+    toast.success("已保存")
+  }
+
+  async function testNotify() {
+    await saveNotify()
+    const res = await visaApi.notifyTest({ auth: getAuth() })
+    if (res.success) toast.success("已发出去")
+    else toast.error(res.message || "发送失败")
+  }
 
   function onSave(e: React.FormEvent) {
     e.preventDefault()
@@ -165,6 +203,67 @@ export function SettingsPage() {
           <p className="text-muted-foreground text-xs">
             Preferences are stored locally in your browser.
           </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>通知</CardTitle>
+          <CardDescription>新订单直接推给机器人，缺任何一项都不发。</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-3">
+          {notify && (
+            <>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid gap-1.5">
+                  <Label htmlFor="notify-url">机器人地址</Label>
+                  <Input
+                    id="notify-url"
+                    value={notify.qq_url}
+                    onChange={(event) => setNotify({ ...notify, qq_url: event.target.value })}
+                    placeholder="http://8.133.217.12:8989"
+                  />
+                </div>
+                <div className="grid gap-1.5">
+                  <Label htmlFor="notify-target">会话 ID</Label>
+                  <Input
+                    id="notify-target"
+                    value={notify.qq_target}
+                    onChange={(event) => setNotify({ ...notify, qq_target: event.target.value })}
+                    placeholder="单聊 userid 或群聊 chatid"
+                  />
+                </div>
+                <div className="grid gap-1.5">
+                  <Label htmlFor="notify-type">会话类型</Label>
+                  <select
+                    id="notify-type"
+                    value={notify.qq_type ?? ""}
+                    onChange={(event) => setNotify({ ...notify, qq_type: event.target.value })}
+                    className="border-input h-9 rounded-md border bg-transparent px-2 text-sm"
+                  >
+                    <option value="">自动</option>
+                    <option value="single">单聊</option>
+                    <option value="group">群聊</option>
+                  </select>
+                </div>
+                <div className="grid gap-1.5">
+                  <Label htmlFor="notify-token">访问令牌</Label>
+                  <Input
+                    id="notify-token"
+                    value={notify.qq_token}
+                    onChange={(event) => setNotify({ ...notify, qq_token: event.target.value })}
+                    placeholder="没有就留空"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button onClick={() => void saveNotify()}>保存</Button>
+                <Button variant="outline" onClick={() => void testNotify()}>
+                  发条测试消息
+                </Button>
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
 
