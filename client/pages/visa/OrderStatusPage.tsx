@@ -15,7 +15,7 @@ import {
   normalizeSlotSupport,
   type VisaSlotSupport,
 } from "@/shared/modules/visa/visa.catalog"
-import { currencyOf, symbolOf } from "@/shared/modules/visa/visa.settings"
+import { currencyOf, symbolOf, VISA_FORM_URLS, type VisaOriginCode } from "@/shared/modules/visa/visa.settings"
 
 const STATUS_LABELS: Record<string, string> = {
   new: "待处理",
@@ -667,6 +667,21 @@ export function OrderStatusPage() {
             </div>
           )}
         </div>
+
+        {locked && order.visa === "申根签证" && (
+          <div className="mt-4 rounded-[28px] border border-line bg-paper-2 p-5 shadow-[0_18px_40px_-32px_rgba(88,61,43,0.55)]">
+            <p className="text-sm font-bold text-ink">签证申请表</p>
+            <p className="mt-1 text-xs text-ink-soft">订单已锁定，请在这份表单里补齐申请信息。</p>
+            <a
+              href={VISA_FORM_URLS[order.origin_code as VisaOriginCode] ?? VISA_FORM_URLS.CN}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-brand px-5 py-2.5 text-xs font-semibold text-[#fff8f1] transition hover:bg-brand-deep"
+            >
+              打开麦克表单
+            </a>
+          </div>
+        )}
 
         {order.status !== "new" && (
           <div className="mt-4 rounded-[28px] border border-line bg-paper-2 p-5 shadow-[0_18px_40px_-32px_rgba(88,61,43,0.55)]">

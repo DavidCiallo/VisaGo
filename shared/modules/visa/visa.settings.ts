@@ -31,6 +31,12 @@ export function currencyOf(originCode: string): VisaCurrency {
     return VISA_ORIGIN_CURRENCY[originCode as VisaOriginCode] ?? DEFAULT_CURRENCY;
 }
 
+/** 申根签的麦克表单，按出发地分 */
+export const VISA_FORM_URLS: Record<VisaOriginCode, string> = {
+    CN: "http://uk.mikecrm.com/k0X1TRQ",
+    UK: "http://uk.mikecrm.com/YORlRMa",
+};
+
 export interface VisaCenter {
     name: string;
     /** 可选日期（浅绿） */
