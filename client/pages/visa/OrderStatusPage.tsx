@@ -22,6 +22,7 @@ const STATUS_LABELS: Record<string, string> = {
   locked: "已锁定",
   booking: "预约中",
   queued: "排号中",
+  brushing: "刷位中",
   done: "已完成",
   cancelled: "已取消",
 }

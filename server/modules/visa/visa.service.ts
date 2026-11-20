@@ -745,7 +745,7 @@ export class VisaService {
     }
 
     static async setStatus(id: string, status: string) {
-        if (!["new", "locked", "booking", "queued", "cancelled"].includes(status)) {
+        if (!["new", "locked", "booking", "queued", "brushing", "cancelled"].includes(status)) {
             throw new Error("未知的订单状态");
         }
         const order = await visaOrderRepository.findOne({ id });

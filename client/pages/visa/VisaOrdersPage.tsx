@@ -38,6 +38,7 @@ const STATUS_LABELS: Record<string, string> = {
   locked: "已锁定",
   booking: "预约中",
   queued: "排号中",
+  brushing: "刷位中",
   done: "已完成",
   cancelled: "已取消",
 }
@@ -714,13 +715,19 @@ export function VisaOrdersPage() {
                       标记预约中
                     </Button>
                   )}
+                  {selected.status === "booking" && (
+                    <Button size="sm" variant="outline" onClick={() => setStatus("queued")}>
+                      标记排号中
+                    </Button>
+                  )}
                   {(selected.status === "booking" || selected.status === "queued") && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setStatus(selected.status === "queued" ? "booking" : "queued")}
-                    >
-                      {selected.status === "queued" ? "退回预约中" : "标记排号中"}
+                    <Button size="sm" variant="outline" onClick={() => setStatus("brushing")}>
+                      标记刷位中
+                    </Button>
+                  )}
+                  {(selected.status === "queued" || selected.status === "brushing") && (
+                    <Button size="sm" variant="outline" onClick={() => setStatus("booking")}>
+                      退回预约中
                     </Button>
                   )}
                   {selected.status !== "new" && (
