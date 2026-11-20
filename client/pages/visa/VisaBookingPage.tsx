@@ -14,8 +14,6 @@ import {
   symbolOf,
   findDestination,
   findOrigin,
-  feeOf,
-  quoteFeeOf,
   isDestinationOffline,
   materialsPlan,
   visaPriceFor,
@@ -134,7 +132,7 @@ export function VisaBookingPage() {
   const pendingOrder = (searchParams.get("order") ?? "").trim().toLowerCase()
   const latestAppointment = dates.length ? [...dates].sort()[dates.length - 1] : ""
   const isLastStep = step === STEPS.length - 1
-  const quote = quoteVisa(visaPrice, travelers, flight, hotel, quoteFeeOf(origin))
+  const quote = quoteVisa(visaPrice, travelers, flight, hotel)
   const tripValid = Number.isInteger(tripDays) && tripDays >= 1 && tripDays <= 180
   const travelTooEarly = Boolean(
     /^\d{4}-\d{2}-\d{2}$/.test(travelDate) &&

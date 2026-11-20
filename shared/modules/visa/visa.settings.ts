@@ -51,8 +51,6 @@ export interface VisaDestination {
 export interface VisaOrigin {
     code: VisaOriginCode;
     label: string;
-    /** 汇兑磨损，按人收，币种同出发地；没配就是 0 */
-    fee?: number;
     destinations: Record<string, VisaDestination>;
 }
 
@@ -198,7 +196,6 @@ export function buildDefaultSettings(): VisaSettings {
         origins: (["CN", "UK"] as VisaOriginCode[]).map((code) => ({
             code,
             label: VISA_ORIGIN_LABELS[code],
-            fee: 0,
             destinations: Object.fromEntries(
                 VISA_COUNTRIES.map((country) => [
                     country.code,
@@ -219,17 +216,6 @@ export function buildDefaultSettings(): VisaSettings {
 
 export function findOrigin(settings: VisaSettings, code: string): VisaOrigin | null {
     return settings.origins.find((origin) => origin.code === code) ?? null;
-}
-
-/** 老配置里没有这一项，一律按 0 收 */
-export function feeOf(origin: VisaOrigin | null | undefined): number {
-    const value = Number(origin?.fee);
-    return Number.isFinite(value) && value > 0 ? value : 0;
-}
-
-/** 汇兑磨损按人民币收，非人民币出发地不并进原币报价，付款时再折过来加。 */
-export function quoteFeeOf(origin: VisaOrigin | null | undefined): number {
-    return origin && currencyOf(origin.code).code === "CNY" ? feeOf(origin) : 0;
 }
 
 export function findDestination(
@@ -337,11 +323,9 @@ export function normalizeSettings(input: any): VisaSettings {
             };
         }
 
-        const rawFee = Number(incoming.fee);
         return {
             code,
             label: VISA_ORIGIN_LABELS[code],
-            fee: Number.isFinite(rawFee) && rawFee > 0 ? Math.round(rawFee * 100) / 100 : 0,
             destinations,
         };
     });
