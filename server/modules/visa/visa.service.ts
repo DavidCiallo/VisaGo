@@ -344,6 +344,19 @@ export class VisaService {
         return await this.getById(id);
     }
 
+    /** 后台按出行人勾「表单已填」，客户页面照着显示还差谁。 */
+    static async setFormFilled(id: string, indexes: number[]) {
+        const row = await this.getById(id);
+        const clean = [...new Set(indexes)]
+            .filter((index) => Number.isInteger(index) && index >= 0 && index < row.travelers)
+            .sort((a, b) => a - b);
+        await visaOrderRepository.update(
+            { id: row.id },
+            { form_filled: clean, update_time: Date.now() },
+        );
+        return await this.getById(id);
+    }
+
     static async setAppointmentDates(id: string, dates: string[]) {
         const row = await this.getById(id);
         const clean = [...new Set(dates.filter((date) => /^\d{4}-\d{2}-\d{2}$/.test(date)))].sort();

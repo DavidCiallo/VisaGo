@@ -168,6 +168,13 @@ export function OrderStatusPage() {
     .filter(Boolean)
     .join(" + ")
   const locked = order.status !== "new"
+  const formFilled = order.form_filled ?? []
+  const formPending = order.passports
+    .map((item, index) => ({
+      index,
+      name: `${item.last_name}${item.first_name}`.trim() || `第 ${index + 1} 位`,
+    }))
+    .filter((item) => !formFilled.includes(item.index))
   const symbol = currencyOf(order.origin_code).symbol
   const canEdit = Boolean(form.travel_date.trim())
 
@@ -672,6 +679,12 @@ export function OrderStatusPage() {
           <div className="mt-4 rounded-[28px] border border-line bg-paper-2 p-5 shadow-[0_18px_40px_-32px_rgba(88,61,43,0.55)]">
             <p className="text-sm font-bold text-ink">签证申请表</p>
             <p className="mt-1 text-xs text-ink-soft">订单已锁定，请在这份表单里补齐申请信息。</p>
+            <p className="mt-1 text-xs text-ink-soft">
+              已填 {formFilled.length}/{order.travelers}
+              {formPending.length
+                ? `，还差 ${formPending.map((item) => item.name).join("、")}`
+                : "，都填好了"}
+            </p>
             <a
               href={VISA_FORM_URLS[order.origin_code as VisaOriginCode] ?? VISA_FORM_URLS.CN}
               target="_blank"

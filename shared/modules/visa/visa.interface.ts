@@ -414,7 +414,15 @@ export interface VisaOrderLockInput {
     auth?: string;
 }
 
-export interface VisaOrderSetStatusInput {    id: string;
+export interface VisaOrderFormInput {
+    id: string;
+    /** 已填好表单的出行人位置 */
+    form_filled: number[];
+    auth?: string;
+}
+
+export interface VisaOrderSetStatusInput {
+    id: string;
     status: string;
     auth?: string;
 }

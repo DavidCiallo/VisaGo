@@ -26,6 +26,7 @@ import {
     VisaOrderAttachInput,
     VisaOrderPositionInput,
     VisaOrderNoteInput,
+    VisaOrderFormInput,
     VisaOrderDatesInput,
     VisaOrderSetStatusInput,
     VisaOrderArchiveInput,
@@ -210,6 +211,16 @@ async function orderNote(request: VisaOrderNoteInput) {
     return { order: await toDTO(row) };
 }
 
+async function orderForm(request: VisaOrderFormInput) {
+    requireLogin(request);
+    const row = await VisaService.setFormFilled(
+        String(request?.id ?? ""),
+        Array.isArray(request?.form_filled) ? request.form_filled : [],
+    );
+
+    return { order: await toDTO(row) };
+}
+
 async function orderDates(request: VisaOrderDatesInput) {
     requireLogin(request);
     const dates = Array.isArray(request?.appointment_dates)
@@ -382,6 +393,7 @@ export const visaMount = {
         orderPosition,
         orderDates,
         orderNote,
+        orderForm,
         orderAttach,
         payCodeList,
         payCodeSave,

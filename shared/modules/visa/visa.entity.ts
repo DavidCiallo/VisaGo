@@ -66,6 +66,8 @@ export interface VisaOrderEntity {
     view_key: string;
     /** 每位出行人由谁填写：位置 -> 填写人凭据 */
     slot_keys?: Record<string, string>;
+    /** 后台勾选过「表单已填」的出行人位置 */
+    form_filled?: number[];
 }
 
 export class VisaOrderDTO {
@@ -100,6 +102,7 @@ export class VisaOrderDTO {
     public position: string;
     public archived: boolean;
     public files: VisaOrderFile[];
+    public form_filled: number[];
 
     constructor(origin: VisaOrderEntity) {
         const country = findCountry(origin.country_code);
@@ -134,5 +137,6 @@ export class VisaOrderDTO {
         this.position = origin.position ?? "";
         this.archived = Boolean(origin.archived_time);
         this.files = origin.files ?? [];
+        this.form_filled = origin.form_filled ?? [];
     }
 }

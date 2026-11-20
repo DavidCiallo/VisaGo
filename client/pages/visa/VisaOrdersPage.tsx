@@ -248,6 +248,24 @@ export function VisaOrdersPage() {
     toast.error(res.message || "保存失败")
   }
 
+  async function toggleForm(index: number, checked: boolean) {
+    if (!selected) return
+    const current = selected.form_filled ?? []
+    const next = checked
+      ? [...current, index].sort((a, b) => a - b)
+      : current.filter((item) => item !== index)
+    const res = await visaApi.orderForm({
+      id: selected.id,
+      form_filled: next,
+      auth: getAuth(),
+    })
+    if (res.success && res.data?.order) {
+      applyOrder(res.data.order)
+      return
+    }
+    toast.error(res.message || "保存失败")
+  }
+
   async function uploadLetter(event: ChangeEvent<HTMLInputElement>) {
     const picked = Array.from(event.target.files ?? [])
     event.target.value = ""
@@ -561,9 +579,20 @@ export function VisaOrdersPage() {
                   {selected.passports.map((passport, index) => (
                     <div key={index} className="space-y-2 rounded-md border p-3">
                       <div className="flex items-start justify-between gap-3">
-                        <p className="text-muted-foreground text-xs font-semibold">
-                          出行人 {index + 1}
-                        </p>
+                        <div className="flex items-center gap-3">
+                          <p className="text-muted-foreground text-xs font-semibold">
+                            出行人 {index + 1}
+                          </p>
+                          <label className="flex items-center gap-1.5 text-xs">
+                            <input
+                              type="checkbox"
+                              checked={(selected.form_filled ?? []).includes(index)}
+                              onChange={(event) => void toggleForm(index, event.target.checked)}
+                              className="size-3.5"
+                            />
+                            表单已填
+                          </label>
+                        </div>
                         {photos.find((photo) => photo.index === index) && (
                           <button
                             type="button"
