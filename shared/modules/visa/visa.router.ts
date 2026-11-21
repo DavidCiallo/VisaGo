@@ -19,6 +19,7 @@ import {
     VisaOrderPositionInput,
     VisaOrderNoteInput,
     VisaOrderFormInput,
+    VisaOrderRevisionInput,
     VisaOrderDatesInput,
     VisaOrderSetStatusInput,
     VisaOrderArchiveInput,
@@ -232,6 +233,11 @@ export const visaRoutes = {
     orderForm: {
         path: "/order-form",
         request: {} as VisaOrderFormInput,
+        response: {} as VisaOrderResponse,
+    },
+    orderRevision: {
+        path: "/order-revision",
+        request: {} as VisaOrderRevisionInput,
         response: {} as VisaOrderResponse,
     },
     orderDates: {

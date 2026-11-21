@@ -344,6 +344,18 @@ export class VisaService {
         return await this.getById(id);
     }
 
+    /** 设成待修改，改动目标必填，客户那边照着改。 */
+    static async setRevision(id: string, note: string) {
+        const row = await this.getById(id);
+        const value = String(note ?? "").trim().slice(0, 300);
+        if (!value) throw new Error("请填写修改目标");
+        await visaOrderRepository.update(
+            { id: row.id },
+            { status: "revising", revision_note: value, update_time: Date.now() },
+        );
+        return await this.getById(id);
+    }
+
     /** 后台按出行人勾「表单已填」，客户页面照着显示还差谁。 */
     static async setFormFilled(id: string, indexes: number[]) {
         const row = await this.getById(id);
@@ -745,7 +757,7 @@ export class VisaService {
     }
 
     static async setStatus(id: string, status: string) {
-        if (!["new", "locked", "booking", "queued", "brushing", "cancelled"].includes(status)) {
+        if (!["new", "locked", "booking", "queued", "brushing", "revising", "cancelled"].includes(status)) {
             throw new Error("未知的订单状态");
         }
         const order = await visaOrderRepository.findOne({ id });

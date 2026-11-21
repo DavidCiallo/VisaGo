@@ -421,6 +421,13 @@ export interface VisaOrderFormInput {
     auth?: string;
 }
 
+export interface VisaOrderRevisionInput {
+    id: string;
+    /** 要改什么，设成待修改时必填 */
+    revision_note: string;
+    auth?: string;
+}
+
 export interface VisaOrderSetStatusInput {
     id: string;
     status: string;

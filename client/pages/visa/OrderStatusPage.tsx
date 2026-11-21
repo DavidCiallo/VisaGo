@@ -23,6 +23,7 @@ const STATUS_LABELS: Record<string, string> = {
   booking: "预约中",
   queued: "排号中",
   brushing: "刷位中",
+  revising: "待修改",
   done: "已完成",
   cancelled: "已取消",
 }
@@ -282,6 +283,15 @@ export function OrderStatusPage() {
           </span>
         </div>
         <p className="mt-1 text-xs text-ink-soft">#{order.id.toUpperCase()}</p>
+
+        {order.status === "revising" && (
+          <div className="mt-4 rounded-[28px] border border-[#e7b48a] bg-[#fbe3cd]/60 p-5">
+            <p className="text-sm font-bold text-ink">这份申请需要修改</p>
+            <p className="mt-1 whitespace-pre-wrap text-xs text-ink">
+              {order.revision_note || "专员正在整理要改的地方"}
+            </p>
+          </div>
+        )}
 
         <div className="mt-5 rounded-[28px] border border-line bg-paper-2 p-5 shadow-[0_18px_40px_-32px_rgba(88,61,43,0.55)]">
           <p className="flex items-center gap-2 text-sm font-bold text-ink">

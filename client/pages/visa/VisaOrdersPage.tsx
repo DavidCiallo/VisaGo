@@ -5,6 +5,7 @@ import { Badge } from "@/client/components/ui/badge"
 import { Button } from "@/client/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/client/components/ui/card"
 import { Input } from "@/client/components/ui/input"
+import { Textarea } from "@/client/components/ui/textarea"
 import {
   Dialog,
   DialogContent,
@@ -39,6 +40,7 @@ const STATUS_LABELS: Record<string, string> = {
   booking: "预约中",
   queued: "排号中",
   brushing: "刷位中",
+  revising: "待修改",
   done: "已完成",
   cancelled: "已取消",
 }
@@ -102,6 +104,8 @@ export function VisaOrdersPage() {
   const [archived, setArchived] = useState<VisaOrderDTO[]>([])
   const [archiveOpen, setArchiveOpen] = useState(false)
   const [confirmCancel, setConfirmCancel] = useState(false)
+  const [revisionOpen, setRevisionOpen] = useState(false)
+  const [revisionDraft, setRevisionDraft] = useState("")
   const [photos, setPhotos] = useState<{ index: number; url: string }[]>([])
   const [settings, setSettings] = useState<VisaSettings | null>(null)
   const [fx, setFx] = useState<{ rate: number; date: string; source: string } | null>(null)
@@ -249,6 +253,27 @@ export function VisaOrdersPage() {
     toast.error(res.message || "保存失败")
   }
 
+  async function submitRevision() {
+    if (!selected) return
+    const note = revisionDraft.trim()
+    if (!note) {
+      toast.error("请填写修改目标")
+      return
+    }
+    const res = await visaApi.orderRevision({
+      id: selected.id,
+      revision_note: note,
+      auth: getAuth(),
+    })
+    if (res.success && res.data?.order) {
+      applyOrder(res.data.order)
+      setRevisionOpen(false)
+      toast.success("已标记待修改")
+      return
+    }
+    toast.error(res.message || "保存失败")
+  }
+
   async function toggleForm(index: number, checked: boolean) {
     if (!selected) return
     const current = selected.form_filled ?? []
@@ -332,27 +357,30 @@ export function VisaOrdersPage() {
       return current.trim() ? `${current.trim()} · ${stamp}` : stamp
     })
   }
-  const filtered = orders.filter((order) => {
-    if (originFilter !== "all" && order.origin_code !== originFilter) return false
-    if (countryFilter !== "all" && order.country_code !== countryFilter) return false
-    const text = keyword.trim().toLowerCase()
-    if (!text) return true
-    return [
-      order.id,
-      order.customer_email,
-      order.customer_name,
-      order.appointment_city,
-      order.appointment_note,
-      ...order.passports.flatMap((passport) => [
-        passport.first_name,
-        passport.last_name,
-        passport.passport_number,
-      ]),
-    ]
-      .join(" ")
-      .toLowerCase()
-      .includes(text)
-  })
+  const filtered = orders
+    .filter((order) => {
+      if (originFilter !== "all" && order.origin_code !== originFilter) return false
+      if (countryFilter !== "all" && order.country_code !== countryFilter) return false
+      const text = keyword.trim().toLowerCase()
+      if (!text) return true
+      return [
+        order.id,
+        order.customer_email,
+        order.customer_name,
+        order.appointment_city,
+        order.appointment_note,
+        ...order.passports.flatMap((passport) => [
+          passport.first_name,
+          passport.last_name,
+          passport.passport_number,
+        ]),
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(text)
+    })
+    // 待修改的排最前面
+    .sort((a, b) => Number(b.status === "revising") - Number(a.status === "revising"))
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const currentPage = Math.min(page, pageCount)
@@ -730,6 +758,18 @@ export function VisaOrdersPage() {
                       退回预约中
                     </Button>
                   )}
+                  {selected.status !== "new" && selected.status !== "cancelled" && selected.status !== "revising" && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setRevisionDraft(selected.revision_note ?? "")
+                        setRevisionOpen(true)
+                      }}
+                    >
+                      标记待修改
+                    </Button>
+                  )}
                   {selected.status !== "new" && (
                     <Button size="sm" variant="outline" onClick={() => setStatus("new")}>
                       退回待处理
@@ -850,6 +890,29 @@ export function VisaOrdersPage() {
               }}
             >
               取消订单
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={revisionOpen} onOpenChange={setRevisionOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>标记待修改</DialogTitle>
+            <DialogDescription>写清要改什么，客户在订单页能看到。</DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={revisionDraft}
+            onChange={(event) => setRevisionDraft(event.target.value)}
+            rows={4}
+            placeholder="例如：护照首页照片反光，重新拍一张"
+          />
+          <div className="flex flex-wrap justify-end gap-2">
+            <Button variant="outline" onClick={() => setRevisionOpen(false)}>
+              取消
+            </Button>
+            <Button disabled={!revisionDraft.trim()} onClick={() => void submitRevision()}>
+              标记
             </Button>
           </div>
         </DialogContent>
