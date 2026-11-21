@@ -280,7 +280,7 @@ export function VisaSettingsPage() {
     patchCenter(countryCode, index, merged)
     setUndoStep(snapshot)
     toast.success(
-      `可选 +${merged.stats.available}、不建议 +${merged.stats.caution}、清掉 ${merged.stats.cleared}`,
+      `正常 +${merged.stats.available}、拥挤 +${merged.stats.caution}、清掉 ${merged.stats.cleared}`,
     )
   }
 
@@ -339,7 +339,7 @@ export function VisaSettingsPage() {
       dates: [...center.dates],
       cautionDates: [...center.cautionDates],
     })
-    toast.success(`${vfs.city}：可选 ${vfs.dates.length} 天、不建议 ${vfs.cautionDates.length} 天`)
+    toast.success(`${vfs.city}：正常 ${vfs.dates.length} 天、拥挤 ${vfs.cautionDates.length} 天`)
   }
 
   function undoScan() {
@@ -625,7 +625,7 @@ export function VisaSettingsPage() {
                       }
                     />
                     <span className="text-muted-foreground shrink-0 text-xs">
-                      可选 {activeCenter.dates.length} · 不建议 {activeCenter.cautionDates.length}
+                      正常 {activeCenter.dates.length} · 拥挤 {activeCenter.cautionDates.length}
                     </span>
                     <Button
                       type="button"
@@ -660,11 +660,11 @@ export function VisaSettingsPage() {
                     <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-3 text-xs">
                       <span className="flex items-center gap-1.5">
                         <i className="size-2.5 rounded-full bg-[#e8f0dc]" />
-                        可选（浅绿）
+                        正常
                       </span>
                       <span className="flex items-center gap-1.5">
                         <i className="size-2.5 rounded-full bg-[#fbe3cd]" />
-                        不建议选（橙）
+                        拥挤
                       </span>
                       <span className="flex items-center gap-1.5">
                         <i className="size-2.5 rounded-full border bg-muted" />
@@ -672,7 +672,7 @@ export function VisaSettingsPage() {
                       </span>
                     </div>
                     <p className="text-muted-foreground mt-1.5 text-xs">
-                      左键拖动标可选，右键标不建议选；从已标色的日期起拖是擦除。排期内的日期由上面的积压时长决定。
+                      左键拖动标正常，右键标拥挤；从已标色的日期起拖是擦除。排期内的日期由上面的积压时长决定。
                     </p>
                     <p className="text-muted-foreground mt-1.5 flex flex-wrap items-center gap-2 text-xs">
                       <span>

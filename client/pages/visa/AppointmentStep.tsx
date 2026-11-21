@@ -62,7 +62,7 @@ export function AppointmentStep({
       icon={CalendarDays}
       title="选择递签日期"
       subtitle={`${visaCenter} · 可多选`}
-      hint="灰色日期暂未开放或名额已满；橙色日期制作周期紧张，不建议选择。"
+      hint="灰色日期还没开放或名额已满，橙色日期比较拥挤。"
     >
       <p className="text-xs font-semibold text-[#6f5b4b]">递签城市</p>
       <div className="mt-2 flex flex-wrap gap-2">
