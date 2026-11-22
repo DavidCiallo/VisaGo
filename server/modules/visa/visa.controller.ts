@@ -45,6 +45,7 @@ import { VisaService } from "./visa.service";
 import { ocrConfigured, recognizePassport } from "./visa.ocr";
 import { parseVfs } from "./visa.vfs";
 import { gbpToCny } from "./visa.fx";
+import { docsPage } from "./visa.docs";
 
 /** 后台接口：请求里必须带有效的登录 token。 */
 function requireLogin(request: any) {
@@ -423,4 +424,10 @@ export const visaMount = {
         exportData,
         importData,
     },
+};
+
+/** 文档不走 visaRoutes：挂在 /api/docs 上，返回的是整页 HTML。 */
+export const docsMount = {
+    routes: { base: "/api", prefix: "", docs: { path: "/docs" } },
+    handlers: { docs: () => docsPage() },
 };

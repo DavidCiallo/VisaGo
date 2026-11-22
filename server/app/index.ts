@@ -13,6 +13,7 @@ import { accountMount } from "../modules/account/account.controller";
 import { demoMount } from "../modules/demo/demo.controller";
 import { blogMount } from "../modules/blog/blog.controller";
 import { visaMount } from "../modules/visa/visa.controller";
+import { docsMount } from "../modules/visa/visa.controller";
 
 const PORT = parseInt(process.env.SERVER_PORT || process.env.PORT || "3300");
 await initialize();
@@ -31,6 +32,7 @@ Bun.serve({
             demoMount,
             blogMount,
             visaMount,
+            docsMount,
         ]);
         if (apiResponse) return apiResponse;
 
