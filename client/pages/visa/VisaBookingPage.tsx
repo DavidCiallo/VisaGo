@@ -143,7 +143,6 @@ export function VisaBookingPage() {
   const canContinue = [
     Boolean(countryCode),
     travelers >= 1,
-    true,
     anyFilled && phoneValid,
     Boolean(city) && dates.length > 0,
     true,

@@ -93,7 +93,7 @@ export function AppointmentStep({
             <MonthCalendar
               className="mt-1"
               selected={dates}
-              months={1}
+              months={2}
               stateOf={stateOf}
               canSelect={(iso) => iso >= today && stateOf(iso) !== "off"}
               onToggle={toggle}
