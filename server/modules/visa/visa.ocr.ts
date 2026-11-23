@@ -108,18 +108,24 @@ function toGender(value?: string) {
 }
 
 function splitName(fields: Record<string, string>) {
-  const source = String(fields.nameEn || fields.name || "").trim()
-  if (!source) return { last_name: "", first_name: "" }
+  const source = String(fields.nameEn || fields.name || "").trim();
+  if (!source) return { last_name: "", first_name: "" };
 
-  const [last, first] = source.split(",")
+  const [last, first] = source.split(",");
   if (first !== undefined) {
-    return { last_name: upper(last), first_name: upper(first) }
+    return { last_name: upper(last), first_name: upper(first) };
   }
-  return { last_name: "", first_name: upper(source) }
+  return { last_name: "", first_name: upper(source) };
+}
+
+/** 中文护照上印的汉字姓名，英文姓名换算不出来。 */
+function toChineseName(fields: Record<string, string>) {
+  const text = String(fields.name || "").trim();
+  return /\p{Script=Han}/u.test(text) ? text : "";
 }
 
 export function toPassportDetails(fields: Record<string, string>): PassportDetails {
-  const { last_name, first_name } = splitName(fields)
+  const { last_name, first_name } = splitName(fields);
 
   return {
     first_name,
@@ -132,6 +138,7 @@ export function toPassportDetails(fields: Record<string, string>): PassportDetai
     passport_number: upper(fields.passportNumber),
     issue_date: toIsoDate(fields.issueDateYmd || fields.issueDate),
     expiry_date: toIsoDate(fields.validToDate || fields.expiryDate),
+    name_cn: toChineseName(fields),
   }
 }
 

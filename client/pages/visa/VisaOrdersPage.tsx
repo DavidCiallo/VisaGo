@@ -650,6 +650,7 @@ export function VisaOrdersPage() {
                             .filter((part) => part && part.trim())
                             .join(" ")}
                         />
+                        <Field label="中文姓名" value={passport.name_cn ?? ""} />
                         <Field label="出生日期" value={passport.birth_date} />
                         <Field label="性别" value={passport.gender} />
                         <Field label="国籍" value={passport.nationality} />

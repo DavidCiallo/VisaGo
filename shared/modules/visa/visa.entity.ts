@@ -19,6 +19,8 @@ export interface PassportDetails {
     passport_number: string;
     issue_date: string;
     expiry_date: string;
+    /** 中文姓名，只有识别中文护照时才有 */
+    name_cn?: string;
 }
 
 export interface VisaOrderFile {

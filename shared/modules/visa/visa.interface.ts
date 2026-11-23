@@ -28,6 +28,7 @@ export interface VisaCreateInput {
 const passportFields: (keyof PassportDetails)[] = [
     "first_name",
     "last_name",
+    "name_cn",
     "birth_date",
     "gender",
     "nationality",
