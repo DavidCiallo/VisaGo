@@ -25,7 +25,6 @@ import { EMAIL_PATTERN, type VisaOrderBrief, type VisaPayCode } from "@/shared/m
 import { CountryStep } from "./CountryStep"
 import { IdentityStep, VisaMark } from "./IdentityStep"
 import { TravelersStep } from "./TravelersStep"
-import { ExtrasStep } from "./ExtrasStep"
 import { PassportStep } from "./PassportStep"
 import { AppointmentStep } from "./AppointmentStep"
 import { SlotSupportStep } from "./SlotSupportStep"
@@ -35,7 +34,6 @@ import { OrderSummary } from "./OrderSummary"
 const STEPS = [
   "选择国家",
   "出行人数",
-  "附加服务",
   "护照信息",
   "递签日期",
   "加急抢号",
@@ -101,8 +99,8 @@ export function VisaBookingPage() {
   const [identityError, setIdentityError] = useState("")
   const [countryCode, setCountryCode] = useState("")
   const [travelers, setTravelers] = useState(1)
-  const [flight, setFlight] = useState(true)
-  const [hotel, setHotel] = useState(true)
+  const [flight, setFlight] = useState(false)
+  const [hotel, setHotel] = useState(false)
   const [passports, setPassports] = useState<PassportDetails[]>([{ ...emptyPassport }])
   const [city, setCity] = useState("")
   const [dates, setDates] = useState<string[]>([])
@@ -555,8 +553,8 @@ export function VisaBookingPage() {
     setOriginCode("CN")
     setCountryCode("")
     setTravelers(1)
-    setFlight(true)
-    setHotel(true)
+    setFlight(false)
+    setHotel(false)
     setPassports([{ ...emptyPassport }])
     setCity("")
     setDates([])
@@ -773,19 +771,6 @@ export function VisaBookingPage() {
             )}
 
             {step === 2 && (
-              <ExtrasStep
-                travelers={travelers}
-                flight={flight}
-                hotel={hotel}
-                symbol={symbol}
-                onChange={(patch) => {
-                  if (patch.flight !== undefined) setFlight(patch.flight)
-                  if (patch.hotel !== undefined) setHotel(patch.hotel)
-                }}
-              />
-            )}
-
-            {step === 3 && (
               <PassportStep
                 passports={passports}
                 onChange={patchPassport}
@@ -793,7 +778,7 @@ export function VisaBookingPage() {
               />
             )}
 
-            {step === 4 && (
+            {step === 3 && (
               <AppointmentStep
                 visaCenter={country?.name ?? ""}
                 centers={centers}
@@ -805,11 +790,11 @@ export function VisaBookingPage() {
               />
             )}
 
-            {step === 5 && (
+            {step === 4 && (
               <SlotSupportStep value={slotSupport} onChange={setSlotSupport} />
             )}
 
-            {step === 6 && (
+            {step === 5 && (
               <TravelStep
                 latestAppointment={latestAppointment}
                 travelDate={travelDate}
@@ -818,7 +803,7 @@ export function VisaBookingPage() {
               />
             )}
 
-            {step === 7 && (
+            {step === 6 && (
               <OrderSummary
                 country={country}
                 origin={origin}
@@ -838,12 +823,12 @@ export function VisaBookingPage() {
 
           <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/95 px-5 py-2 backdrop-blur-md sm:static sm:mt-5 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
             <div className="mx-auto max-w-5xl">
-              {step === 3 && (!anyFilled || !phoneValid) && (
+              {step === 2 && (!anyFilled || !phoneValid) && (
                 <p className="mb-1 text-right text-[11px] font-medium text-[#a06a2c] sm:mb-2 sm:text-xs">
                   {phoneValid ? "至少填写一位出行人姓名，其余可下单后补交。" : "填写第一位出行人的手机号后继续。"}
                 </p>
               )}
-              {step === 4 && (!city || !dates.length) && (
+              {step === 3 && (!city || !dates.length) && (
                 <p className="mb-1 text-right text-[11px] font-medium text-[#a06a2c] sm:mb-2 sm:text-xs">
                   选择签证中心并至少选一天递签日期。
                 </p>
@@ -864,7 +849,7 @@ export function VisaBookingPage() {
                 >
                 {submitting
                   ? "正在保存…"
-                  : step === 7
+                  : step === 6
                     ? "确认预订"
                     : "继续"}
                 {!submitting && (
