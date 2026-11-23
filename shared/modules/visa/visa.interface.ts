@@ -17,6 +17,8 @@ export interface VisaCreateInput {
     flight: boolean;
     hotel: boolean;
     passports: PassportDetails[];
+    /** 护照首页照片，按出行人位置对齐；没拍就是空串 */
+    passport_images?: string[];
     appointment_city: string;
     appointment_dates: string[];
     appointment_note: string;
@@ -69,6 +71,7 @@ export class VisaCreateRequest {
     public flight: boolean;
     public hotel: boolean;
     public passports: PassportDetails[];
+    public passport_images: string[];
     public appointment_city: string;
     public appointment_dates: string[];
     public appointment_note: string;
@@ -106,6 +109,12 @@ export class VisaCreateRequest {
         if (!this.passports.some(passportFilled)) {
             throw new Error("请至少填写一位出行人的姓名");
         }
+
+        const rawImages: any[] = Array.isArray(data.passport_images) ? data.passport_images : [];
+        this.passport_images = this.passports.map((_, index) => {
+            const image = String(rawImages[index] ?? "");
+            return image.startsWith("data:image/") ? image : "";
+        });
 
         this.appointment_city = String(data.appointment_city ?? "");
         if (!this.appointment_city) throw new Error("请选择递签城市");

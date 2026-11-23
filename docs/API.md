@@ -53,6 +53,7 @@ POST /api/visa/create
       "passport_number": "", "issue_date": "", "expiry_date": ""   // 其余字段可空
     }
   ],
+  "passport_images": ["data:image/png;base64,..."],  // 可选，和 passports 一一对应，后台能看原件
   "appointment_city": "北京",            // 必须是配置里的签证中心名
   "appointment_dates": ["2026-12-08"],  // 至少一个，且在该中心开放的日期里
   "appointment_note": "",

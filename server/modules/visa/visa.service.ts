@@ -655,7 +655,7 @@ export class VisaService {
             req.hotel,
         );
 
-        return await visaOrderRepository.insert({
+        const order = await visaOrderRepository.insert({
             invite_token: Math.random().toString(36).slice(2, 10),
             view_key: nanoid(20),
             customer_email: req.customer_email,
@@ -682,6 +682,16 @@ export class VisaService {
             void this.notifyNewOrder(order).catch(() => {});
             return order;
         });
+
+        await this.savePassportPhotos(order.invite_token, req.passport_images);
+        return order;
+    }
+
+    /** 下单时拍的护照照片，按出行人位置存好，后台可以直接看。 */
+    static async savePassportPhotos(token: string, images: string[]) {
+        for (const [index, image] of images.entries()) {
+            if (image) await this.savePassportPhoto(token, index, image);
+        }
     }
 
     /** 新订单推一条 QQ，发不出去不影响下单。 */

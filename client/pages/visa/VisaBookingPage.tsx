@@ -102,6 +102,8 @@ export function VisaBookingPage() {
   const [flight, setFlight] = useState(false)
   const [hotel, setHotel] = useState(false)
   const [passports, setPassports] = useState<PassportDetails[]>([{ ...emptyPassport }])
+  /** 拍下来的护照首页，跟着订单一起存 */
+  const [passportImages, setPassportImages] = useState<string[]>([])
   const [city, setCity] = useState("")
   const [dates, setDates] = useState<string[]>([])
   const [note, setNote] = useState("")
@@ -447,6 +449,7 @@ export function VisaBookingPage() {
 
   function changeTravelers(count: number) {
     setTravelers(count)
+    setPassportImages((current) => current.slice(0, count))
     setPassports((current) =>
       Array.from({ length: count }, (_, index) => current[index] ?? { ...emptyPassport }),
     )
@@ -512,6 +515,7 @@ export function VisaBookingPage() {
       flight,
       hotel,
       passports,
+      passport_images: passportImages,
       appointment_city: city,
       appointment_dates: dates,
       appointment_note: note.trim(),
@@ -556,6 +560,7 @@ export function VisaBookingPage() {
     setFlight(false)
     setHotel(false)
     setPassports([{ ...emptyPassport }])
+    setPassportImages([])
     setCity("")
     setDates([])
     setNote("")
@@ -774,6 +779,13 @@ export function VisaBookingPage() {
               <PassportStep
                 passports={passports}
                 onChange={patchPassport}
+                onImage={(index, image) =>
+                  setPassportImages((current) => {
+                    const next = [...current]
+                    next[index] = image
+                    return next
+                  })
+                }
                 travelerCount={travelers}
               />
             )}

@@ -107,6 +107,7 @@ export function VisaOrdersPage() {
   const [revisionOpen, setRevisionOpen] = useState(false)
   const [revisionDraft, setRevisionDraft] = useState("")
   const [photos, setPhotos] = useState<{ index: number; url: string }[]>([])
+  const [photoUrl, setPhotoUrl] = useState("")
   const [settings, setSettings] = useState<VisaSettings | null>(null)
   const [fx, setFx] = useState<{ rate: number; date: string; source: string } | null>(null)
   const [candidates, setCandidates] = useState<string[]>([])
@@ -605,7 +606,9 @@ export function VisaOrdersPage() {
                   护照信息（{selected.passports.length} 位出行人）
                 </p>
                 <div className="space-y-2">
-                  {selected.passports.map((passport, index) => (
+                  {selected.passports.map((passport, index) => {
+                    const photo = photos.find((item) => item.index === index)
+                    return (
                     <div key={index} className="space-y-2 rounded-md border p-3">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-center gap-3">
@@ -622,46 +625,45 @@ export function VisaOrdersPage() {
                             表单已填
                           </label>
                         </div>
-                        {photos.find((photo) => photo.index === index) && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              window.open(
-                                photos.find((photo) => photo.index === index)!.url,
-                                "_blank",
-                                "noopener",
-                              )
-                            }
-                            className="shrink-0 overflow-hidden rounded border transition hover:opacity-80"
-                            title="查看护照照片"
-                          >
-                            <img
-                              src={photos.find((photo) => photo.index === index)!.url}
-                              alt="护照照片"
-                              className="h-16 w-24 bg-white object-cover"
-                            />
-                          </button>
-                        )}
                       </div>
                       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                        <Field
-                          label="名/姓"
-                          value={[passport.first_name, passport.last_name]
-                            .filter((part) => part && part.trim())
-                            .join(" ")}
-                        />
-                        <Field label="中文姓名" value={passport.name_cn ?? ""} />
-                        <Field label="出生日期" value={passport.birth_date} />
+                        {Boolean(passport.name_cn?.trim()) ? (
+                          <Field label="中文姓名" value={passport.name_cn ?? ""} />
+                        ) : (
+                          <div />
+                        )}
+                        <Field label="名拼写" value={passport.first_name} />
+                        <Field label="姓拼写" value={passport.last_name} />
+                        <Field label="手机号" value={passport.phone} />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                         <Field label="性别" value={passport.gender} />
+                        <Field label="出生日期" value={passport.birth_date} />
                         <Field label="国籍" value={passport.nationality} />
                         <Field label="出生地" value={passport.birth_place} />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                         <Field label="护照号" value={passport.passport_number} />
                         <Field label="签发日期" value={passport.issue_date} />
                         <Field label="有效期至" value={passport.expiry_date} />
-                        <Field label="手机号" value={passport.phone} />
+                        <div>
+                          <p className="text-muted-foreground text-xs">护照原件</p>
+                          {photo ? (
+                            <button
+                              type="button"
+                              onClick={() => setPhotoUrl(photo.url)}
+                              className="text-sm font-semibold text-brand hover:underline"
+                            >
+                              查看
+                            </button>
+                          ) : (
+                            <p className="text-sm">—</p>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
 
@@ -916,6 +918,17 @@ export function VisaOrdersPage() {
               标记
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={Boolean(photoUrl)} onOpenChange={(open) => !open && setPhotoUrl("")}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>护照原件</DialogTitle>
+          </DialogHeader>
+          {photoUrl && (
+            <img src={photoUrl} alt="护照原件" className="w-full rounded-lg bg-white" />
+          )}
         </DialogContent>
       </Dialog>
 

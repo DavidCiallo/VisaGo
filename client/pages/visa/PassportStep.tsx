@@ -23,10 +23,13 @@ export function PassportStep({
   passports,
   travelerCount,
   onChange,
+  onImage,
 }: {
   passports: PassportDetails[]
   travelerCount: number
   onChange: (index: number, patch: Partial<PassportDetails>) => void
+  /** 拍下的照片交给上层；同行人补录那边不需要存 */
+  onImage?: (index: number, image: string) => void
 }) {
   const [active, setActive] = useState(0)
   const [mode, setMode] = useState<Mode>("intro")
@@ -84,6 +87,7 @@ export function PassportStep({
 
     try {
       const image = await toUploadImage(file)
+      onImage?.(active, image)
       const res = await visaApi.ocrPassport({ image })
       const fields = res.data?.passport
       if (!res.success || !fields) {
