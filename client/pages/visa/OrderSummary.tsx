@@ -4,9 +4,7 @@ import { CountryFlag } from "@/client/components/visa/CountryFlag"
 import {
   quoteVisa,
   VISA_EXTRA_FEE,
-  VISA_SLOT_SUPPORT_LABELS,
   type VisaCountry,
-  type VisaSlotSupport,
 } from "@/shared/modules/visa/visa.catalog"
 import { currencyOf, type VisaOrigin } from "@/shared/modules/visa/visa.settings"
 
@@ -39,7 +37,6 @@ export function OrderSummary({
   appointmentNote,
   travelDate,
   tripDays,
-  slotSupport,
 }: {
   country: VisaCountry | null
   origin: VisaOrigin | null
@@ -52,7 +49,6 @@ export function OrderSummary({
   appointmentNote: string
   travelDate: string
   tripDays: number
-  slotSupport: VisaSlotSupport
 }) {
   const quote = quoteVisa(visaPrice, travelers, flight, hotel)
   const symbol = currencyOf(origin?.code ?? "CN").symbol
@@ -158,7 +154,6 @@ export function OrderSummary({
               </p>
             )}
             {appointmentNote && <p>备注：{appointmentNote}</p>}
-            <p>加急抢号：{VISA_SLOT_SUPPORT_LABELS[slotSupport]}</p>
           </div>
         </div>
       )}

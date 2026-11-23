@@ -10,8 +10,6 @@ import { toast } from "@/client/methods/notify"
 import type { VisaOrderDTO } from "@/shared/modules/visa/visa.entity"
 import {
   MAX_TRAVELERS,
-  VISA_SLOT_SUPPORT_OPTIONS,
-  VISA_SLOT_SUPPORT_LABELS,
   normalizeSlotSupport,
   type VisaSlotSupport,
 } from "@/shared/modules/visa/visa.catalog"
@@ -327,10 +325,6 @@ export function OrderStatusPage() {
               <dt className="text-ink-soft">附加服务</dt>
               <dd>{extras || "无"}</dd>
             </div>
-            <div className="flex justify-between gap-3">
-              <dt className="text-ink-soft">加急抢号</dt>
-              <dd>{VISA_SLOT_SUPPORT_LABELS[order.slot_support] ?? "视号源而定"}</dd>
-            </div>
             {order.appointment_note && (
               <div className="flex justify-between gap-3">
                 <dt className="shrink-0 text-ink-soft">备注</dt>
@@ -418,26 +412,6 @@ export function OrderStatusPage() {
                   </button>
                 )
               })}
-            </div>
-
-            <p className="mt-4 text-xs font-semibold text-[#6f5b4b]">加急抢号</p>
-            <div className="mt-1.5 grid gap-2 sm:grid-cols-3">
-              {VISA_SLOT_SUPPORT_OPTIONS.map((option) => (
-                <button
-                  key={option.key}
-                  type="button"
-                  aria-pressed={form.slot_support === option.key}
-                  onClick={() => setForm({ ...form, slot_support: option.key })}
-                  className={cn(
-                    "rounded-2xl border px-3 py-2 text-left text-xs font-semibold transition",
-                    form.slot_support === option.key
-                      ? "border-brand bg-brand-soft/60 text-brand-deep"
-                      : "border-line bg-paper-2 text-ink-soft hover:border-brand/40",
-                  )}
-                >
-                  {option.label}
-                </button>
-              ))}
             </div>
 
             <label className="mt-4 block">

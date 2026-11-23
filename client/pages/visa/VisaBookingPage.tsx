@@ -27,7 +27,6 @@ import { IdentityStep, VisaMark } from "./IdentityStep"
 import { TravelersStep } from "./TravelersStep"
 import { PassportStep } from "./PassportStep"
 import { AppointmentStep } from "./AppointmentStep"
-import { SlotSupportStep } from "./SlotSupportStep"
 import { TravelStep } from "./TravelStep"
 import { OrderSummary } from "./OrderSummary"
 
@@ -36,7 +35,6 @@ const STEPS = [
   "出行人数",
   "护照信息",
   "递签日期",
-  "加急抢号",
   "出行计划",
   "确认订单",
 ]
@@ -145,7 +143,6 @@ export function VisaBookingPage() {
     travelers >= 1,
     anyFilled && phoneValid,
     Boolean(city) && dates.length > 0,
-    true,
     Boolean(travelDate.trim()) && tripValid && !travelTooEarly,
     true,
   ][step]
@@ -802,10 +799,6 @@ export function VisaBookingPage() {
             )}
 
             {step === 4 && (
-              <SlotSupportStep value={slotSupport} onChange={setSlotSupport} />
-            )}
-
-            {step === 5 && (
               <TravelStep
                 latestAppointment={latestAppointment}
                 travelDate={travelDate}
@@ -814,7 +807,7 @@ export function VisaBookingPage() {
               />
             )}
 
-            {step === 6 && (
+            {step === 5 && (
               <OrderSummary
                 country={country}
                 origin={origin}
@@ -827,7 +820,6 @@ export function VisaBookingPage() {
                 appointmentNote={note.trim()}
                 travelDate={travelDate}
                 tripDays={tripDays}
-                slotSupport={slotSupport}
               />
             )}
           </div>
@@ -860,7 +852,7 @@ export function VisaBookingPage() {
                 >
                 {submitting
                   ? "正在保存…"
-                  : step === 6
+                  : step === 5
                     ? "确认预订"
                     : "继续"}
                 {!submitting && (
