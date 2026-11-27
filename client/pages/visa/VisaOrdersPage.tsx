@@ -22,7 +22,7 @@ import {
   TableRow,
 } from "@/client/components/ui/table"
 import { visaApi } from "@/client/api/instance"
-import { cn } from "@/client/lib/utils"
+import { cn, formatDates } from "@/client/lib/utils"
 import { getAuth } from "@/client/methods/auth"
 import { toast } from "@/client/methods/notify"
 import { VISA_COUNTRIES, VISA_SLOT_SUPPORT_LABELS } from "@/shared/modules/visa/visa.catalog"
@@ -59,11 +59,6 @@ function pad(value: number) {
 function formatTime(time: number) {
   const date = new Date(time)
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
-}
-
-function formatDay(iso: string) {
-  if (!iso) return "—"
-  return `${Number(iso.slice(5, 7))}月${Number(iso.slice(8, 10))}日`
 }
 
 function Field({ label, value }: { label: string; value: string | number }) {
@@ -536,7 +531,7 @@ export function VisaOrdersPage() {
                     <TableCell>
                       <span>{order.appointment_city}</span>
                       <span className="text-muted-foreground ml-2 text-xs">
-                        {order.appointment_dates.map(formatDay).join("、")}
+                        {formatDates(order.appointment_dates)}
                       </span>
                     </TableCell>
                     <TableCell className="text-muted-foreground text-xs">

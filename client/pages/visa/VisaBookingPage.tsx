@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight, Check, Sparkles } from "lucide-react"
 
 import { VisaFooter, VisaHeader } from "@/client/components/visa/VisaHeader"
 import { CountryFlag } from "@/client/components/visa/CountryFlag"
-import { cn } from "@/client/lib/utils"
+import { cn, formatDates } from "@/client/lib/utils"
 import { visaApi } from "@/client/api/instance"
 import { toast } from "@/client/methods/notify"
 import { findCountry, normalizeSlotSupport, quoteVisa, type VisaSlotSupport } from "@/shared/modules/visa/visa.catalog"
@@ -936,7 +936,7 @@ function BookingSuccess({ order, payCode }: { order: VisaOrderDTO; payCode: Visa
           <div className="flex justify-between gap-3">
             <dt className="shrink-0 text-ink-soft">递签日期</dt>
             <dd className="text-right">
-              {order.appointment_city} · {order.appointment_dates.join("、")}
+              {order.appointment_city} · {formatDates(order.appointment_dates)}
             </dd>
           </div>
           <div className="flex justify-between gap-3">

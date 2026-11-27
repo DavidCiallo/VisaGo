@@ -5,6 +5,16 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
+/** 递签日期列表：三个以内全列，再多只列前三个。 */
+export function formatDates(dates: string[], limit = 3): string {
+    const monthDay = (iso: string) => {
+        const [, month, day] = iso.split("-");
+        return `${Number(month)}月${Number(day)}日`;
+    };
+    if (dates.length <= limit) return dates.map(monthDay).join("、");
+    return `${dates.slice(0, limit).map(monthDay).join("、")} 和其它 ${dates.length - limit} 个日期`;
+}
+
 const IMAGE_MAX_EDGE = 1600;
 const IMAGE_TARGET_CHARS = 600 * 1024;
 

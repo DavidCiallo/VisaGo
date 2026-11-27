@@ -3,7 +3,7 @@ import { Link, useParams, useSearchParams } from "react-router-dom"
 import { Check, PencilLine, Trash2, UserRoundPlus } from "lucide-react"
 
 import { VisaFooter, VisaHeader } from "@/client/components/visa/VisaHeader"
-import { cn } from "@/client/lib/utils"
+import { cn, formatDates } from "@/client/lib/utils"
 import { visaApi } from "@/client/api/instance"
 import { toast } from "@/client/methods/notify"
 import type { PassportDetails } from "@/shared/modules/visa/visa.entity"
@@ -175,7 +175,7 @@ export function JoinPage() {
             <div className="flex justify-between gap-3">
               <dt className="shrink-0 text-ink-soft">递签</dt>
               <dd className="text-right">
-                {order.appointment_city} · {order.appointment_dates.join("、")}
+                {order.appointment_city} · {formatDates(order.appointment_dates)}
               </dd>
             </div>
             <div className="flex justify-between gap-3">
