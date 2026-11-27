@@ -24,6 +24,7 @@ import {
     VisaRemoveTravelerInput,
     VisaOcrInput,
     VisaOrderAttachInput,
+    VisaOrderFileRemoveInput,
     VisaOrderPositionInput,
     VisaOrderNoteInput,
     VisaOrderFormInput,
@@ -254,6 +255,16 @@ async function orderAttach(request: VisaOrderAttachInput) {
     return { order: await toDTO(row) };
 }
 
+async function orderFileRemove(request: VisaOrderFileRemoveInput) {
+    requireLogin(request);
+    const row = await VisaService.removeFile(
+        String(request?.id ?? ""),
+        String(request?.file_id ?? ""),
+    );
+
+    return { order: await toDTO(row) };
+}
+
 async function payCodeList(request: VisaPayCodeListInput) {
     requireLogin(request);
 
@@ -408,6 +419,7 @@ export const visaMount = {
         orderForm,
         orderRevision,
         orderAttach,
+        orderFileRemove,
         payCodeList,
         payCodeSave,
         payCodeRemove,

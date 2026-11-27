@@ -384,6 +384,24 @@ export class VisaService {
         return await this.getById(id);
     }
 
+    /** 删掉挂上去的预约信，上传的文件一起清掉。 */
+    static async removeFile(id: string, fileId: string) {
+        const row = await this.getById(id);
+        const files = row.files ?? [];
+        const target = files.find((file) => file.id === fileId);
+        if (!target) throw new Error("文件已经不在了");
+
+        await visaOrderRepository.update(
+            { id: row.id },
+            {
+                files: files.filter((file) => file.id !== fileId),
+                update_time: Date.now(),
+            },
+        );
+        fs.rmSync(path.join(UPLOAD_DIR, target.id), { force: true });
+        return await this.getById(id);
+    }
+
     /** 后台传预约信：文件挂到订单上，状态同时走到已完成。 */
     static async attachFile(id: string, name: string, data: string) {
         const row = await this.getById(id);
@@ -767,7 +785,7 @@ export class VisaService {
     }
 
     static async setStatus(id: string, status: string) {
-        if (!["new", "locked", "booking", "queued", "brushing", "revising", "cancelled"].includes(status)) {
+        if (!["new", "locked", "booking", "queued", "brushing", "revising", "done", "cancelled"].includes(status)) {
             throw new Error("未知的订单状态");
         }
         const order = await visaOrderRepository.findOne({ id });

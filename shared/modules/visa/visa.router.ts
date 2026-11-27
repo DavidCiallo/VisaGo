@@ -16,6 +16,7 @@ import {
     VisaOcrInput,
     VisaOcrResponse,
     VisaOrderAttachInput,
+    VisaOrderFileRemoveInput,
     VisaOrderPositionInput,
     VisaOrderNoteInput,
     VisaOrderFormInput,
@@ -248,6 +249,11 @@ export const visaRoutes = {
     orderAttach: {
         path: "/order-attach",
         request: {} as VisaOrderAttachInput,
+        response: {} as VisaOrderResponse,
+    },
+    orderFileRemove: {
+        path: "/order-file-remove",
+        request: {} as VisaOrderFileRemoveInput,
         response: {} as VisaOrderResponse,
     },
     file: {

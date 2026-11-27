@@ -293,6 +293,21 @@ export function VisaOrdersPage() {
     toast.error(res.message || "保存失败")
   }
 
+  async function removeFile(fileId: string) {
+    if (!selected) return
+    const res = await visaApi.orderFileRemove({
+      id: selected.id,
+      file_id: fileId,
+      auth: getAuth(),
+    })
+    if (res.success && res.data?.order) {
+      applyOrder(res.data.order)
+      toast.success("已删除")
+      return
+    }
+    toast.error(res.message || "删除失败")
+  }
+
   async function uploadLetter(event: ChangeEvent<HTMLInputElement>) {
     const picked = Array.from(event.target.files ?? [])
     event.target.value = ""
@@ -761,6 +776,11 @@ export function VisaOrdersPage() {
                       退回预约中
                     </Button>
                   )}
+                  {["locked", "booking", "queued", "brushing", "revising"].includes(selected.status) && (
+                    <Button size="sm" variant="outline" onClick={() => setStatus("done")}>
+                      标记已完成
+                    </Button>
+                  )}
                   {selected.status !== "new" && selected.status !== "cancelled" && selected.status !== "revising" && (
                     <Button
                       size="sm"
@@ -855,15 +875,25 @@ export function VisaOrdersPage() {
                         onChange={uploadLetter}
                       />
                       {selected.files.map((file) => (
-                        <a
-                          key={file.id}
-                          href={`/api/visa/file?id=${file.id}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-xs underline underline-offset-2"
-                        >
-                          {file.name}
-                        </a>
+                        <span key={file.id} className="flex items-center gap-1">
+                          <a
+                            href={`/api/visa/file?id=${file.id}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-xs underline underline-offset-2"
+                          >
+                            {file.name}
+                          </a>
+                          {selected.status === "revising" && (
+                            <button
+                              type="button"
+                              onClick={() => void removeFile(file.id)}
+                              className="text-muted-foreground text-xs transition hover:text-destructive"
+                            >
+                              删除
+                            </button>
+                          )}
+                        </span>
                       ))}
                     </div>
                   </div>
