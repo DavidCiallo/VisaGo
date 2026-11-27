@@ -65,7 +65,8 @@ function to24(hour: number, meridiem?: string): number {
     return hour;
 }
 
-/** 常见写法都收：2026-12-08 09:30 / 08-12-2026 09:30 / 8 December 2026 09:30 / December 8, 2026 9:30 AM / 2026年12月8日 09:30。 */
+/** 常见写法都收：2026-12-08 09:30 / 08-12-2026 09:30 / 8 December 2026 09:30 / December 8, 2026 9:30 AM / 2026年12月8日 09:30。
+ *  挪威那份把日期和时间分两行写（Appointment Date 02-12-2026 Appointment Time 10:45 am），中间隔的字多一些。 */
 export function findDateTimes(text: string): string[] {
     const found = new Set<string>();
     const add = (stamp: string | null) => {
@@ -74,7 +75,7 @@ export function findDateTimes(text: string): string[] {
 
     // 2026-12-08 09:30、2026/12/08、2026年12月8日 09:30
     for (const m of text.matchAll(
-        /(\d{4})[-/.年]\s?(\d{1,2})[-/.月]\s?(\d{1,2})日?[^\d]{0,12}?(\d{1,2}):(\d{2})(?:\s*([AaPp][Mm]))?/g,
+        /(\d{4})[-/.年]\s?(\d{1,2})[-/.月]\s?(\d{1,2})日?[^\d]{0,30}?(\d{1,2}):(\d{2})(?:\s*([AaPp][Mm]))?/g,
     )) {
         add(
             toStamp(
@@ -89,7 +90,7 @@ export function findDateTimes(text: string): string[] {
 
     // 30-11-2026 10:30、08/12/2026 14:45（按日/月/年）
     for (const m of text.matchAll(
-        /(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})[^\d]{0,12}?(\d{1,2}):(\d{2})(?:\s*([AaPp][Mm]))?/g,
+        /(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})[^\d]{0,30}?(\d{1,2}):(\d{2})(?:\s*([AaPp][Mm]))?/g,
     )) {
         add(
             toStamp(
@@ -104,7 +105,7 @@ export function findDateTimes(text: string): string[] {
 
     // 8 December 2026 09:30
     for (const m of text.matchAll(
-        /(\d{1,2})\s+([A-Za-z]{3,9})\.?,?\s+(\d{4})[^\d]{0,12}?(\d{1,2}):(\d{2})(?:\s*([AaPp][Mm]))?/g,
+        /(\d{1,2})\s+([A-Za-z]{3,9})\.?,?\s+(\d{4})[^\d]{0,30}?(\d{1,2}):(\d{2})(?:\s*([AaPp][Mm]))?/g,
     )) {
         const month = MONTHS[m[2].slice(0, 3).toLowerCase()];
         if (!month) continue;
@@ -113,7 +114,7 @@ export function findDateTimes(text: string): string[] {
 
     // December 8, 2026 9:30 AM
     for (const m of text.matchAll(
-        /([A-Za-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4})[^\d]{0,12}?(\d{1,2}):(\d{2})(?:\s*([AaPp][Mm]))?/g,
+        /([A-Za-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4})[^\d]{0,30}?(\d{1,2}):(\d{2})(?:\s*([AaPp][Mm]))?/g,
     )) {
         const month = MONTHS[m[1].slice(0, 3).toLowerCase()];
         if (!month) continue;
@@ -121,4 +122,10 @@ export function findDateTimes(text: string): string[] {
     }
 
     return [...found].sort();
+}
+
+/** VFS 的单号：三个字母加一串数字，例如 ISL78667774645（后面偶尔跟 /1 表示第几位申请人）。 */
+export function findReference(text: string): string {
+    const match = /\b([A-Z]{3}\d{6,15})\b/.exec(text.toUpperCase());
+    return match ? match[1] : "";
 }

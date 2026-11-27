@@ -67,7 +67,7 @@ async function saveSettings(request: VisaSaveSettingsInput) {
 async function letterDates(request: VisaLetterDatesInput) {
     requireLogin(request);
 
-    return { dates: await VisaService.letterDates(request.id) };
+    return await VisaService.letterDates(request.id);
 }
 
 

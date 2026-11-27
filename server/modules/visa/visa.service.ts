@@ -33,7 +33,7 @@ import {
 import { ocrConfigured, recognizePassport, recognizeWords } from "./visa.ocr";
 import { gbpToCny } from "./visa.fx";
 import { notifyConfigured, sendQQ } from "./visa.notify";
-import { extractPdfText, findDateTimes } from "./visa.pdf";
+import { extractPdfText, findDateTimes, findReference } from "./visa.pdf";
 
 interface VisaSettingsRow {
     id: string;
@@ -820,6 +820,7 @@ export class VisaService {
     static async letterDates(id: string) {
         const order = await this.getById(id);
         const dates = new Set<string>();
+        let reference = "";
 
         for (const file of order.files ?? []) {
             if (!file.name.toLowerCase().endsWith(".pdf")) continue;
@@ -827,12 +828,13 @@ export class VisaService {
                 const buffer = fs.readFileSync(this.resolveUpload(file.id));
                 const text = await extractPdfText(buffer);
                 for (const stamp of findDateTimes(text)) dates.add(stamp);
+                if (!reference) reference = findReference(text);
             } catch {
                 // 读不出来就跳过这一份
             }
         }
 
-        return [...dates].sort();
+        return { dates: [...dates].sort(), reference };
     }
 
 

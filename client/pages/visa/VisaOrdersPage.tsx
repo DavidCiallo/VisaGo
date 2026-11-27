@@ -354,6 +354,20 @@ export function VisaOrdersPage() {
     const dates = res.data?.dates ?? []
     setCandidates(dates)
     if (!dates.length) toast.error("预约信里没认出日期时间")
+
+    // 预约到的位置还空着就把单号填进去，省得再敲一遍
+    const reference = res.data?.reference ?? ""
+    if (reference && !selected.position?.trim()) {
+      const saved = await visaApi.orderPosition({
+        id: selected.id,
+        position: reference,
+        auth: getAuth(),
+      })
+      if (saved.success && saved.data?.order) {
+        applyOrder(saved.data.order)
+        setPositionDraft(reference)
+      }
+    }
   }
 
   function toggleStamp(stamp: string) {
