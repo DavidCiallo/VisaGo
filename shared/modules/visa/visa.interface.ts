@@ -270,8 +270,7 @@ export interface VisaLetterDatesInput {
 
 export interface VisaLetterDatesResponse {
     success: boolean;
-    /** reference 是预约信上的单号，例如 ISL78667774645 */
-    data?: { dates: string[]; reference?: string };
+    data?: { dates: string[] };
     message?: string;
 }
 

@@ -402,13 +402,14 @@ export class VisaService {
         return await this.getById(id);
     }
 
-    /** 后台传预约信：文件挂到订单上，状态同时走到已完成。 */
+    /** 后台传预约信：文件挂到订单上，状态同时走到已完成；认得出单号就把文件名换成单号。 */
     static async attachFile(id: string, name: string, data: string) {
         const row = await this.getById(id);
         const upload = writeUpload(data);
+        const reference = await this.referenceOf(path.join(UPLOAD_DIR, upload.id));
         const file: VisaOrderFile = {
             id: upload.id,
-            name: String(name || "预约信").slice(0, 80),
+            name: reference ? `${reference}.pdf` : String(name || "预约信").slice(0, 80),
             size: upload.size,
             time: Date.now(),
         };
@@ -422,6 +423,15 @@ export class VisaService {
             },
         );
         return await this.getById(id);
+    }
+
+    /** 预约信上印着 ISL78667774645 这种单号，读不出文字（扫描件）就当没有。 */
+    static async referenceOf(filePath: string) {
+        try {
+            return findReference(await extractPdfText(fs.readFileSync(filePath)));
+        } catch {
+            return "";
+        }
     }
 
     /** 档期截图只取文字和坐标，怎么判断哪天可选由前端按像素看。 */
@@ -820,7 +830,6 @@ export class VisaService {
     static async letterDates(id: string) {
         const order = await this.getById(id);
         const dates = new Set<string>();
-        let reference = "";
 
         for (const file of order.files ?? []) {
             if (!file.name.toLowerCase().endsWith(".pdf")) continue;
@@ -828,13 +837,12 @@ export class VisaService {
                 const buffer = fs.readFileSync(this.resolveUpload(file.id));
                 const text = await extractPdfText(buffer);
                 for (const stamp of findDateTimes(text)) dates.add(stamp);
-                if (!reference) reference = findReference(text);
             } catch {
                 // 读不出来就跳过这一份
             }
         }
 
-        return { dates: [...dates].sort(), reference };
+        return [...dates].sort();
     }
 
 
